@@ -165,6 +165,19 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
+function AnimatedPercent({ value }: { value: number }) {
+  return (
+    <motion.span
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      className="text-[10px] uppercase tracking-[0.18em] text-slate-300"
+    >
+      {value}%
+    </motion.span>
+  );
+}
+
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
   const { transform } = useParallax(18);
@@ -395,74 +408,132 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             className="mx-auto mb-10 max-w-3xl text-center"
           >
-            <p className="mb-3 text-[12px] uppercase tracking-[0.2em] text-[#7B91FF]">Live Data Reading</p>
-            <h2 className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">AI system processing data in motion.</h2>
+            <p className="mb-3 text-[12px] uppercase tracking-[0.2em] text-[#7B91FF]">Live Data Flow</p>
+            <h2 className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">A real-time pipeline processing data across every stage.</h2>
           </motion.div>
 
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.5 }}
-              className="rounded-[30px] border border-white/10 bg-[#0a1421]/90 p-5 shadow-[0_25px_60px_rgba(2,6,23,0.5)] backdrop-blur-xl"
+              transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+              animate={{ y: [0, -4, 0] }}
+              className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#050d18]/90 p-5 shadow-[0_30px_80px_rgba(2,6,23,0.6)] backdrop-blur-xl"
             >
-              <div className="mb-5 flex items-center justify-between">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(138,160,255,0.18),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(91,182,177,0.12),_transparent_28%)]" />
+              <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] [background-size:28px_28px]" />
+
+              <div className="relative z-10 mb-5 flex items-center justify-between">
                 <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Pipeline status</div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-300">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#8aa0ff]/20 bg-[#8aa0ff]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#dfe7ff] shadow-[0_0_18px_rgba(138,160,255,0.14)]">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-[#5bb6b1]" />
-                  Live
+                  Processing
                 </div>
               </div>
 
-              <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#09151f] p-4">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(123,145,255,0.12),_transparent_38%),radial-gradient(circle_at_bottom_right,_rgba(91,182,177,0.1),_transparent_35%)]" />
+              <div className="relative z-10 overflow-hidden rounded-[26px] border border-white/10 bg-[#08131d]/85 p-4">
+                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#8aa0ff]/8 to-transparent" />
+                <div className="absolute inset-x-4 bottom-8 h-20 opacity-80">
+                  <svg viewBox="0 0 600 120" preserveAspectRatio="none" className="h-full w-full" aria-hidden="true">
+                    <motion.path
+                      d="M 0 62 C 42 60, 60 90, 110 58 S 180 28, 240 62 S 320 90, 390 56 S 480 32, 600 70"
+                      fill="none"
+                      stroke="rgba(138,160,255,0.5)"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      animate={{ pathLength: [0.2, 1, 0.2] }}
+                      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <motion.path
+                      d="M 0 76 C 58 80, 96 44, 146 70 S 224 96, 300 62 S 394 36, 470 74 S 548 84, 600 62"
+                      fill="none"
+                      stroke="rgba(91,182,177,0.45)"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      animate={{ pathLength: [0.3, 1, 0.3], opacity: [0.35, 0.8, 0.35] }}
+                      transition={{ duration: 7.2, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  </svg>
+                </div>
+
                 <div className="relative mb-4 flex items-center justify-between gap-2">
                   <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Flow</div>
                   <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/5">
                     <motion.div
-                      animate={{ x: ["-20%", "100%", "-20%"] }}
+                      animate={{ x: ["-25%", "100%", "-25%"] }}
                       transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-                      className="h-full w-1/3 rounded-full bg-gradient-to-r from-[#8aa0ff] to-[#5bb6b1]"
+                      className="h-full w-1/3 rounded-full bg-gradient-to-r from-[#8aa0ff] via-[#9a6bff] to-[#5bb6b1]"
                     />
                   </div>
                 </div>
 
                 <div className="relative">
-                  <div className="absolute left-0 right-0 top-1/2 hidden h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent md:block" />
+                  <div className="absolute left-6 right-6 top-1/2 hidden h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent md:block" />
+                  <div className="absolute left-10 right-10 top-1/2 hidden h-10 -translate-y-1/2 md:block">
+                    {[...Array(12)].map((_, particleIndex) => (
+                      <motion.span
+                        key={particleIndex}
+                        className="absolute top-1/2 h-1.5 w-1.5 rounded-full bg-[#8aa0ff] shadow-[0_0_12px_rgba(138,160,255,0.85)]"
+                        style={{
+                          left: `${(particleIndex / 12) * 100}%`,
+                          transform: "translateY(-50%)",
+                        }}
+                        animate={{
+                          x: [0, 28, 0],
+                          opacity: [0.2, 1, 0.2],
+                        }}
+                        transition={{
+                          duration: 2.4 + particleIndex * 0.18,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: particleIndex * 0.12,
+                        }}
+                      />
+                    ))}
+                  </div>
 
                   <div className="relative grid gap-3 md:grid-cols-5">
                     {flowSteps.map((step, index) => {
                       const Icon = step.icon;
-                      const isActive = index < flowSteps.length - 1 || step.progress > 80;
+                      const active = index < flowSteps.length - 1 || step.progress >= 90;
 
                       return (
                         <motion.div
                           key={step.label}
-                          initial={{ opacity: 0, y: 12 }}
+                          initial={{ opacity: 0, y: 14 }}
                           whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true, amount: 0.3 }}
-                          transition={{ duration: 0.35, delay: index * 0.07 }}
-                          whileHover={{ y: -2, scale: 1.01 }}
+                          viewport={{ once: true, amount: 0.25 }}
+                          transition={{ duration: 0.45, delay: index * 0.08, ease: [0.4, 0, 0.2, 1] }}
+                          whileHover={{ y: -4, scale: 1.02 }}
                           className="relative"
                         >
-                          <div className={`rounded-2xl border p-3 ${isActive ? "border-white/10 bg-[#0d1a2a]" : "border-white/5 bg-white/[0.02]"}`}>
-                            <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl ${isActive ? "bg-[#0f2339] text-[#e6ebff]" : "bg-[#111b2b] text-slate-400"}`}>
-                              <Icon className="h-4 w-4" />
+                          <motion.div
+                            animate={active ? { boxShadow: ["0 0 0 rgba(138,160,255,0.1)", "0 0 28px rgba(138,160,255,0.18)", "0 0 0 rgba(138,160,255,0.1)"] } : {}}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                            className={`relative overflow-hidden rounded-[22px] border p-3.5 ${active ? "border-[#8aa0ff]/30 bg-[#0d1a2b]/95" : "border-white/8 bg-white/[0.025]"}`}
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
+                            <div className="relative z-10">
+                              <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl border ${active ? "border-[#8aa0ff]/30 bg-[#0f2338] text-[#edf2ff] shadow-[0_0_18px_rgba(138,160,255,0.18)]" : "border-white/5 bg-[#111b2b] text-slate-400"}`}>
+                                <Icon className="h-4 w-4" />
+                              </div>
+
+                              <div className="mb-2 flex items-center justify-between gap-2">
+                                <span className="text-[11px] font-medium text-white">{step.label}</span>
+                                <AnimatedPercent value={step.progress} />
+                              </div>
+
+                              <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${step.progress}%` }}
+                                  transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 + index * 0.08 }}
+                                  className={`h-full rounded-full ${active ? "bg-gradient-to-r from-[#8aa0ff] via-[#9a6bff] to-[#5bb6b1] shadow-[0_0_16px_rgba(138,160,255,0.5)]" : "bg-slate-600"}`}
+                                />
+                              </div>
                             </div>
-                            <div className="mb-2 flex items-center justify-between gap-2 text-[11px] text-slate-300">
-                              <span className="font-medium text-white">{step.label}</span>
-                              <span>{step.progress}%</span>
-                            </div>
-                            <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${step.progress}%` }}
-                                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 + index * 0.08 }}
-                                className={`h-full rounded-full ${isActive ? "bg-gradient-to-r from-[#8aa0ff] to-[#5bb6b1]" : "bg-slate-600"}`}
-                              />
-                            </div>
-                          </div>
+                          </motion.div>
                         </motion.div>
                       );
                     })}
@@ -472,11 +543,11 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.5, delay: 0.08 }}
-              className="rounded-[30px] border border-white/10 bg-[#0a1421]/90 p-5 shadow-[0_25px_60px_rgba(2,6,23,0.5)] backdrop-blur-xl"
+              transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1], delay: 0.08 }}
+              className="rounded-[34px] border border-white/10 bg-[#060d18]/90 p-5 shadow-[0_30px_80px_rgba(2,6,23,0.62)] backdrop-blur-xl"
             >
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -507,9 +578,9 @@ export default function LandingPage() {
                   ].map((item, index) => (
                     <motion.div
                       key={item}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.25, delay: index * 0.06 }}
+                      initial={{ opacity: 0, x: 8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.28, delay: index * 0.07, ease: [0.4, 0, 0.2, 1] }}
                       className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-2.5 py-2"
                     >
                       <span className="h-1.5 w-1.5 rounded-full bg-[#8aa0ff]" />
@@ -518,101 +589,24 @@ export default function LandingPage() {
                   ))}
                 </div>
 
-                <div className="mt-4 rounded-xl border border-white/10 bg-[#0b1a2d] p-3">
+                <div className="mt-4 rounded-[18px] border border-white/10 bg-[#0b1a2d] p-3">
                   <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-slate-400">
                     <span className="inline-block h-2 w-2 rounded-full bg-[#5bb6b1]" />
                     Active stream
                   </div>
+
                   <div className="flex min-h-[52px] items-end gap-1">
                     {[28, 34, 42, 31, 44, 36, 58, 52, 64, 54, 68, 62, 74, 70, 80, 75, 84, 76, 66, 60].map((bar, index) => (
                       <motion.span
                         key={`${bar}-${index}`}
                         animate={{ height: [bar, bar + 10, bar] }}
-                        transition={{ duration: 1.3, repeat: Infinity, delay: index * 0.06, ease: "easeInOut" }}
-                        className="w-1.5 rounded-full bg-gradient-to-t from-[#8aa0ff] to-[#5bb6b1]"
+                        transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: index * 0.06 }}
+                        className="w-1.5 rounded-full bg-gradient-to-t from-[#8aa0ff] to-[#5bb6b1] shadow-[0_0_14px_rgba(91,182,177,0.4)]"
                         style={{ height: `${bar}px` }}
                       />
                     ))}
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          </div>
-
-          <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.5 }}
-              className="rounded-[30px] border border-white/10 bg-[#0a1421]/90 p-5 shadow-[0_25px_60px_rgba(2,6,23,0.45)] backdrop-blur-xl"
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Quality overview</div>
-                <div className="text-sm font-medium text-[#dfe7ff]">92/100</div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-[88px_1fr] sm:items-center">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-[#0d1a2a] text-lg font-semibold text-white">
-                  92
-                </div>
-
-                <div className="space-y-3">
-                  {[
-                    { label: "Completeness", value: 94 },
-                    { label: "Validity", value: 89 },
-                    { label: "Uniqueness", value: 83 }
-                  ].map((metric) => (
-                    <div key={metric.label}>
-                      <div className="mb-1.5 flex items-center justify-between text-[11px] text-slate-300">
-                        <span>{metric.label}</span>
-                        <span>{metric.value}%</span>
-                      </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${metric.value}%` }}
-                          transition={{ duration: 0.9, ease: "easeOut" }}
-                          className="h-full rounded-full bg-gradient-to-r from-[#8aa0ff] to-[#5bb6b1]"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.5, delay: 0.08 }}
-              className="rounded-[30px] border border-white/10 bg-[#0a1421]/90 p-5 shadow-[0_25px_60px_rgba(2,6,23,0.45)] backdrop-blur-xl"
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Alerts</div>
-                <div className="text-[10px] uppercase tracking-[0.18em] text-[#dfe7ff]">3 items</div>
-              </div>
-
-              <div className="space-y-3">
-                {alerts.map((alert, index) => (
-                  <motion.div
-                    key={alert.label}
-                    initial={{ opacity: 0, x: 10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                    className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.02] px-3 py-2.5"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#111d2d] text-[#dfe7ff]">
-                        <AlertTriangle className="h-3.5 w-3.5 text-[#b5c3d9]" />
-                      </div>
-                      <span className="text-sm text-slate-200">{alert.label}</span>
-                    </div>
-                    <span className={`text-xs font-medium ${alert.tone}`}>{alert.value}</span>
-                  </motion.div>
-                ))}
               </div>
             </motion.div>
           </div>
