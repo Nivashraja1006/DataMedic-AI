@@ -129,8 +129,8 @@ export default function ChatWidget() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
         className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-[#7b91ff] via-[#9a6bff] to-[#2fd9c4] text-white shadow-[0_0_28px_rgba(123,145,255,0.8)]"
-        animate={{ boxShadow: ["0 0 0 rgba(125, 211, 252, 0.2)", "0 0 26px rgba(125, 211, 252, 0.45)", "0 0 0 rgba(125, 211, 252, 0.2)"] }}
-        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ boxShadow: "0 0 26px rgba(125, 211, 252, 0.45)" }}
+        transition={{ duration: 2.4, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
       >
         <MessageSquareText className="h-6 w-6" />
         <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#34d399] text-[10px] text-[#062d20]">

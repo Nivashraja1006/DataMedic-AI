@@ -248,8 +248,8 @@ export default function LandingPage() {
                         strokeWidth="2"
                         strokeDasharray="8 8"
                         fill="none"
-                        animate={{ pathLength: [0.4, 1, 0.4] }}
-                        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 3.2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                       />
                     </svg>
 
@@ -261,8 +261,8 @@ export default function LandingPage() {
                           <motion.div
                             key={step.label}
                             whileHover={{ y: -3, scale: 1.02 }}
-                            animate={isActive ? { boxShadow: ["0 0 0 rgba(94,234,212,0.12)", "0 10px 22px rgba(94,234,212,0.14)", "0 0 0 rgba(94,234,212,0.12)"] } : {}}
-                            transition={{ duration: 2.8, repeat: Infinity, ease: [0.4, 0, 0.2, 1] }}
+                            animate={isActive ? { boxShadow: "0 10px 22px rgba(94,234,212,0.14)" } : {}}
+                            transition={{ duration: 2.8, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                             className={`relative rounded-2xl border p-3 text-center ${isActive ? "border-[#7ee0d6]/50 bg-[#0f1f2d]" : "border-white/10 bg-white/[0.02]"}`}
                           >
                             <div className={`mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl ${index % 2 === 0 ? "bg-gradient-to-br from-[#7b91ff] to-[#6ee7d9]" : "bg-gradient-to-br from-[#9a6bff] to-[#7b91ff]"} text-white`}>
@@ -286,8 +286,8 @@ export default function LandingPage() {
                       <div className="flex items-center gap-4">
                         <div className="relative flex h-28 w-28 items-center justify-center rounded-full border border-white/10 bg-[#111c2d]">
                           <motion.div
-                            animate={{ scale: [1, 1.03, 1] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: [0.4, 0, 0.2, 1] }}
+                            animate={{ scale: 1.03 }}
+                            transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                             className="absolute inset-2 rounded-full border border-[#7ee0d6]/40"
                           />
                           <div className="text-center">
@@ -403,7 +403,7 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
-              animate={{ y: [0, -4, 0] }}
+              animate={{ y: -4 }}
               className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#050d18]/90 p-5 shadow-[0_30px_80px_rgba(2,6,23,0.6)] backdrop-blur-xl"
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(138,160,255,0.18),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(91,182,177,0.12),_transparent_28%)]" />
@@ -427,8 +427,8 @@ export default function LandingPage() {
                       stroke="rgba(138,160,255,0.5)"
                       strokeWidth="2"
                       strokeLinecap="round"
-                      animate={{ pathLength: [0.2, 1, 0.2] }}
-                      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 6, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                     />
                     <motion.path
                       d="M 0 76 C 58 80, 96 44, 146 70 S 224 96, 300 62 S 394 36, 470 74 S 548 84, 600 62"
@@ -436,8 +436,8 @@ export default function LandingPage() {
                       stroke="rgba(91,182,177,0.45)"
                       strokeWidth="1.5"
                       strokeLinecap="round"
-                      animate={{ pathLength: [0.3, 1, 0.3], opacity: [0.35, 0.8, 0.35] }}
-                      transition={{ duration: 7.2, repeat: Infinity, ease: "easeInOut" }}
+                      animate={{ pathLength: 1, opacity: 0.8 }}
+                      transition={{ duration: 7.2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                     />
                   </svg>
                 </div>
@@ -446,8 +446,8 @@ export default function LandingPage() {
                   <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Flow</div>
                   <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/5">
                     <motion.div
-                      animate={{ x: ["-25%", "100%", "-25%"] }}
-                      transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+                      animate={{ x: "100%" }}
+                      transition={{ duration: 3.8, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                       className="h-full w-1/3 rounded-full bg-gradient-to-r from-[#8aa0ff] via-[#9a6bff] to-[#5bb6b1]"
                     />
                   </div>
@@ -494,8 +494,8 @@ export default function LandingPage() {
                           className="relative"
                         >
                           <motion.div
-                            animate={active ? { boxShadow: ["0 0 0 rgba(138,160,255,0.1)", "0 0 28px rgba(138,160,255,0.18)", "0 0 0 rgba(138,160,255,0.1)"] } : {}}
-                            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                            animate={active ? { boxShadow: "0 0 28px rgba(138,160,255,0.18)" } : {}}
+                            transition={{ duration: 2.5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                             className={`relative overflow-hidden rounded-[22px] border p-3.5 ${active ? "border-[#8aa0ff]/30 bg-[#0d1a2b]/95" : "border-white/8 bg-white/[0.025]"}`}
                           >
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
@@ -584,8 +584,8 @@ export default function LandingPage() {
                     {[28, 34, 42, 31, 44, 36, 58, 52, 64, 54, 68, 62, 74, 70, 80, 75, 84, 76, 66, 60].map((bar, index) => (
                       <motion.span
                         key={`${bar}-${index}`}
-                        animate={{ height: [bar, bar + 10, bar] }}
-                        transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: index * 0.06 }}
+                        animate={{ height: bar + 10 }}
+                        transition={{ duration: 1.4, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: index * 0.06 }}
                         className="w-1.5 rounded-full bg-gradient-to-t from-[#8aa0ff] to-[#5bb6b1] shadow-[0_0_14px_rgba(91,182,177,0.4)]"
                         style={{ height: `${bar}px` }}
                       />

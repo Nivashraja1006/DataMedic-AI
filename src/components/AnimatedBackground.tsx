@@ -3,26 +3,8 @@
 import { motion } from "framer-motion";
 
 export default function AnimatedBackground() {
-  const blobs = [
-    { className: "-top-20 -left-16 h-72 w-72 bg-[#4f46e5]/12", duration: 18 },
-    { className: "top-1/3 right-0 h-80 w-80 bg-[#22d3ee]/10", duration: 22 },
-    { className: "bottom-0 left-1/3 h-96 w-96 bg-[#a855f7]/10", duration: 26 },
-  ];
-
-  const particles = Array.from({ length: 18 }, (_, index) => ({
-    id: index,
-    size: 3 + ((index * 7) % 8),
-    left: `${(index * 13) % 100}%`,
-    top: `${(index * 17) % 100}%`,
-    duration: 12 + (index % 8),
-    delay: (index % 5) * 1.5,
-  }));
-
-  const waveLines = [
-    "M-20 65 C 80 30, 180 90, 300 60 S 480 30, 620 65 S 830 100, 1000 60",
-    "M-20 120 C 120 72, 220 142, 360 110 S 560 75, 760 118 S 960 150, 1100 122",
-    "M-20 165 C 100 140, 210 188, 360 162 S 590 128, 790 172 S 1000 198, 1120 168",
-  ];
+  const singleFloat = { className: "-top-20 -left-16 h-72 w-72 bg-[#4f46e5]/10", duration: 18 };
+  const singleFlowLine = "M-20 120 C 120 72, 220 142, 360 110 S 560 75, 760 118 S 960 150, 1100 122";
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -30,77 +12,38 @@ export default function AnimatedBackground() {
 
       <motion.div
         className="absolute inset-0 opacity-70"
-        animate={{ opacity: [0.55, 0.72, 0.55] }}
+        animate={{ opacity: 0.7 }}
         transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
         style={{
           backgroundImage:
-            "linear-gradient(120deg, rgba(59,130,246,0.08), rgba(168,85,247,0.08), rgba(34,211,238,0.06), rgba(15,23,42,0.0))",
+            "linear-gradient(120deg, rgba(59,130,246,0.06), rgba(168,85,247,0.06), rgba(34,211,238,0.04), rgba(15,23,42,0.0))",
           backgroundSize: "200% 200%",
         }}
       />
 
-      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px)", backgroundSize: "52px 52px" }} />
+      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(rgba(148,163,184,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.06) 1px, transparent 1px)", backgroundSize: "52px 52px" }} />
 
       <svg className="absolute inset-0 h-full w-full opacity-40" viewBox="0 0 1200 500" preserveAspectRatio="none" aria-hidden="true">
-        {waveLines.map((line, index) => (
-          <motion.path
-            key={line}
-            d={line}
-            fill="none"
-            stroke="rgba(156, 170, 255, 0.22)"
-            strokeWidth="1.2"
-            animate={{ x: 14, opacity: 0.28 }}
-            transition={{
-              duration: 16 + index * 4,
-              ease: "easeInOut",
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-          />
-        ))}
+        <motion.path
+          d={singleFlowLine}
+          fill="none"
+          stroke="rgba(156, 170, 255, 0.22)"
+          strokeWidth="1.2"
+          animate={{ x: 12, opacity: 0.28 }}
+          transition={{ duration: 16, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+        />
       </svg>
 
-      {blobs.map((blob, index) => (
-        <motion.div
-          key={index}
-          className={`absolute rounded-full blur-3xl ${blob.className}`}
-          animate={{ x: 18, y: -12, scale: 1.06 }}
-          transition={{
-            duration: blob.duration,
-            ease: "easeInOut",
-            repeat: Infinity,
-            repeatType: "reverse",
-          }}
-        />
-      ))}
-
       <motion.div
-        className="absolute inset-x-0 bottom-[-12%] h-48 bg-[radial-gradient(circle_at_center,rgba(95,117,255,0.12),transparent_55%)] blur-3xl"
-        animate={{ scaleX: 1.08, opacity: 0.26 }}
-        transition={{ duration: 15, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+        className={`absolute rounded-full blur-2xl ${singleFloat.className}`}
+        animate={{ x: 18, y: -12, scale: 1.04 }}
+        transition={{
+          duration: singleFloat.duration,
+          ease: "easeInOut",
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
       />
-
-      {particles.map((particle) => (
-        <motion.span
-          key={particle.id}
-          className="absolute rounded-full bg-white/35"
-          style={{
-            width: particle.size,
-            height: particle.size,
-            left: particle.left,
-            top: particle.top,
-            boxShadow: "0 0 14px rgba(148, 163, 184, 0.28)",
-          }}
-          animate={{ y: -12, opacity: 0.38, x: 6 }}
-          transition={{
-            duration: particle.duration,
-            delay: particle.delay,
-            ease: "easeInOut",
-            repeat: Infinity,
-            repeatType: "reverse",
-          }}
-        />
-      ))}
     </div>
   );
 }
