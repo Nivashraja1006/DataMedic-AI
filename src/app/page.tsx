@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Navbar from "@/components/Navbar";
-import DashboardPreview from "@/components/landing/DashboardPreview";
 import ChatWidget from "@/components/ChatWidget";
 import HeroText from "@/components/HeroText";
 import Slideshow from "@/components/Slideshow";
 import { useParallax } from "@/hooks/useParallax";
 import {
+  AlertTriangle,
   ArrowRight,
   BarChart3,
   Bot,
@@ -25,6 +26,30 @@ import {
   Sparkles,
   Wand2,
 } from "lucide-react";
+
+const pipelineSteps = [
+  { label: "Upload", icon: Database, progress: "42%", active: false },
+  { label: "Parsing", icon: Sparkles, progress: "58%", active: false },
+  { label: "Cleaning", icon: ShieldCheck, progress: "78%", active: true },
+  { label: "Validation", icon: Gauge, progress: "87%", active: true },
+  { label: "AI Insight", icon: Bot, progress: "96%", active: false },
+];
+
+const chartData = [
+  { name: "Mon", value: 64 },
+  { name: "Tue", value: 68 },
+  { name: "Wed", value: 72 },
+  { name: "Thu", value: 70 },
+  { name: "Fri", value: 85 },
+  { name: "Sat", value: 88 },
+  { name: "Sun", value: 92 },
+];
+
+const alerts = [
+  { label: "Nulls", value: "2.4%", tone: "text-[#60a5fa]" },
+  { label: "Duplicates", value: "0.7%", tone: "text-[#fbbf24]" },
+  { label: "Outliers", value: "4.1%", tone: "text-[#fb7185]" },
+];
 
 const featureCards = [
   {
@@ -144,7 +169,7 @@ export default function LandingPage() {
       <AnimatedBackground />
       <Navbar />
 
-      <main className="relative z-10 bg-[#f4f8fb] text-slate-900">
+      <main className="relative z-10 bg-[#020617] text-[#edf2ff]">
         <section id="home" className="mx-auto grid max-w-7xl items-center gap-10 px-6 pb-20 pt-12 md:px-10 lg:grid-cols-[1.02fr_0.98fr] lg:pb-28 lg:pt-16">
           <motion.div
             initial="hidden"
@@ -162,145 +187,174 @@ export default function LandingPage() {
             className="relative"
             style={{ transform: `perspective(1200px) rotateX(${transform.rotateX}) rotateY(${transform.rotateY})` }}
           >
-            <div className="relative mx-auto max-w-[620px] rounded-[32px] border border-slate-200/80 bg-white/75 p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-              <div className="rounded-[28px] border border-slate-200 bg-[#f8fbff] p-4">
+            <div className="absolute -left-8 top-8 h-28 w-28 rounded-full bg-[#7b91ff]/20 blur-3xl" />
+            <div className="absolute -right-8 bottom-8 h-32 w-32 rounded-full bg-[#5eead4]/20 blur-3xl" />
+
+            <div className="relative mx-auto max-w-[620px] rounded-[32px] border border-white/10 bg-white/[0.03] p-4 shadow-[0_25px_90px_rgba(9,14,25,0.78)] backdrop-blur-xl">
+              <div className="rounded-[28px] border border-white/10 bg-[#09111d]/90 p-4">
                 <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#14b8a6]" />
+                  <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-300">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#5eead4]" />
                     Live data pipeline
                   </div>
-                  <div className="rounded-full border border-[#14b8a6]/20 bg-[#ecfdf5] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#0f766e]">
+                  <div className="rounded-full border border-[#7b91ff]/30 bg-[#7b91ff]/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#dfe7ff]">
                     Running
                   </div>
                 </div>
 
-                <div className="relative overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef8ff] p-4">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,184,166,0.08),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.08),transparent_30%)]" />
-
-                  <div className="relative mb-5 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/70 px-3 py-2">
+                <div className="rounded-[24px] border border-white/10 bg-gradient-to-br from-[#0c1628] via-[#0c1220] to-[#10192f] p-4">
+                  <div className="mb-5 flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#14b8a6]/15 to-[#3b82f6]/15 text-[#0f172a]">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#7b91ff]/18 to-[#5eead4]/18 text-[#dfe7ff]">
                         <Database className="h-4 w-4" />
                       </div>
                       <div>
-                        <div className="text-xs font-medium text-slate-500">customer_export.csv</div>
+                        <div className="text-xs font-medium text-slate-200">customer_export.csv</div>
                         <div className="text-[11px] text-slate-400">214 rows • 14 columns</div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-[10px] uppercase tracking-[0.18em] text-slate-400">Status</div>
-                      <div className="text-sm font-semibold text-[#0f766e]">Processing</div>
+                      <div className="text-sm font-semibold text-[#7ee0d6]">Processing</div>
                     </div>
                   </div>
 
-                  <div className="relative mb-5">
-                    <svg className="absolute left-1/2 top-8 h-[120px] w-[80%] -translate-x-1/2" viewBox="0 0 500 120" preserveAspectRatio="none" aria-hidden="true">
+                  <div className="relative mb-5 px-2">
+                    <svg className="absolute left-1/2 top-9 h-[120px] w-[82%] -translate-x-1/2" viewBox="0 0 500 120" preserveAspectRatio="none" aria-hidden="true">
                       <motion.path
-                        d="M 28 60 L 110 60 M 110 60 L 210 60 M 210 60 L 315 60 M 315 60 L 430 60"
-                        stroke="rgba(20,184,166,0.35)"
+                        d="M 26 60 L 100 60 M 100 60 L 195 60 M 195 60 L 300 60 M 300 60 L 410 60"
+                        stroke="rgba(126, 224, 214, 0.4)"
                         strokeWidth="2"
                         strokeDasharray="8 8"
                         fill="none"
-                        animate={{ pathLength: [0.45, 1, 0.45] }}
+                        animate={{ pathLength: [0.4, 1, 0.4] }}
                         transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
                       />
                     </svg>
 
                     <div className="grid grid-cols-5 gap-3">
-                      {[
-                        { label: "Upload", color: "bg-[#14b8a6]", icon: Database },
-                        { label: "Parsing", color: "bg-[#3b82f6]", icon: Sparkles },
-                        { label: "Cleaning", color: "bg-[#10b981]", icon: ShieldCheck },
-                        { label: "Validation", color: "bg-[#14b8a6]", icon: Gauge },
-                        { label: "AI Insight", color: "bg-[#3b82f6]", icon: Bot },
-                      ].map((step, index) => {
+                      {pipelineSteps.map((step, index) => {
                         const Icon = step.icon;
-                        const isActive = index === 2 || index === 3;
+                        const isActive = step.active;
                         return (
                           <motion.div
                             key={step.label}
                             whileHover={{ y: -3, scale: 1.02 }}
-                            animate={isActive ? { boxShadow: ["0 0 0 rgba(20,184,166,0.08)", "0 10px 20px rgba(20,184,166,0.14)", "0 0 0 rgba(20,184,166,0.08)"] } : {}}
-                            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                            className={`relative rounded-2xl border ${isActive ? "border-[#14b8a6]/50 bg-white" : "border-slate-200 bg-white/80"} p-3 text-center shadow-sm`}
+                            animate={isActive ? { boxShadow: ["0 0 0 rgba(94,234,212,0.12)", "0 10px 22px rgba(94,234,212,0.14)", "0 0 0 rgba(94,234,212,0.12)"] } : {}}
+                            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                            className={`relative rounded-2xl border p-3 text-center ${isActive ? "border-[#7ee0d6]/50 bg-[#0f1f2d]" : "border-white/10 bg-white/[0.02]"}`}
                           >
-                            <div className={`mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl ${step.color} text-white shadow-sm`}>
+                            <div className={`mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl ${index % 2 === 0 ? "bg-gradient-to-br from-[#7b91ff] to-[#6ee7d9]" : "bg-gradient-to-br from-[#9a6bff] to-[#7b91ff]"} text-white`}>
                               <Icon className="h-4 w-4" />
                             </div>
-                            <div className="text-[11px] font-medium text-slate-700">{step.label}</div>
-                            <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-slate-400">
-                              {index === 0 ? "45%" : index === 1 ? "62%" : index === 2 ? "78%" : index === 3 ? "87%" : "96%"}
-                            </div>
+                            <div className="text-[11px] font-medium text-slate-200">{step.label}</div>
+                            <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-slate-400">{step.progress}</div>
                           </motion.div>
                         );
                       })}
                     </div>
                   </div>
 
-                  <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-                    <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
-                      <div className="mb-3 flex items-center justify-between text-[11px] text-slate-500">
-                        <span className="uppercase tracking-[0.18em]">Reading file</span>
-                        <span className="font-medium text-[#0f766e]">214 rows</span>
+                  <div className="grid gap-4 xl:grid-cols-[1.14fr_0.86fr]">
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                      <div className="mb-3 flex items-center justify-between text-[11px] text-slate-300">
+                        <span className="uppercase tracking-[0.18em]">Quality score</span>
+                        <span className="font-medium text-[#7ee0d6]">92/100</span>
                       </div>
 
-                      <div className="space-y-3">
-                        {[
-                          "Parsing columns...",
-                          "Detecting null values...",
-                          "AI analyzing anomalies...",
-                        ].map((log, index) => (
-                          <div key={log} className="flex items-center gap-3">
-                            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#14b8a6]" style={{ opacity: 0.4 + index * 0.3 }} />
-                            <span className="text-sm text-slate-600">{log}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="mt-4 space-y-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-500">
-                          <span>Scan progress</span>
-                          <span>78%</span>
-                        </div>
-                        <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+                      <div className="flex items-center gap-4">
+                        <div className="relative flex h-28 w-28 items-center justify-center rounded-full border border-white/10 bg-[#111c2d]">
                           <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: "78%" }}
-                            transition={{ duration: 1.2, ease: "easeOut" }}
-                            className="h-full rounded-full bg-gradient-to-r from-[#14b8a6] via-[#3b82f6] to-[#10b981]"
+                            animate={{ scale: [1, 1.04, 1] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute inset-2 rounded-full border border-[#7ee0d6]/40"
                           />
+                          <div className="text-center">
+                            <div className="text-3xl font-semibold text-white">92</div>
+                            <div className="text-[10px] uppercase tracking-[0.18em] text-slate-400">Score</div>
+                          </div>
+                        </div>
+
+                        <div className="flex-1 space-y-3">
+                          {[
+                            { label: "Completeness", value: 94, color: "#7b91ff" },
+                            { label: "Validity", value: 89, color: "#6ee7d9" },
+                            { label: "Uniqueness", value: 82, color: "#9a6bff" },
+                          ].map((metric) => (
+                            <div key={metric.label}>
+                              <div className="mb-1 flex items-center justify-between text-[11px] text-slate-300">
+                                <span>{metric.label}</span>
+                                <span>{metric.value}%</span>
+                              </div>
+                              <div className="h-2 rounded-full bg-white/5">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${metric.value}%` }}
+                                  transition={{ duration: 1, ease: "easeOut" }}
+                                  className="h-full rounded-full"
+                                  style={{ background: metric.color }}
+                                />
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-4">
-                      <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
-                        <div className="mb-3 flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                          <span>Quality score</span>
-                          <span className="text-[#0f766e]">92</span>
+                      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                        <div className="mb-3 flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                          <AlertTriangle className="h-3.5 w-3.5 text-[#fbbf24]" />
+                          Alerts
                         </div>
-                        <div className="relative mx-auto flex h-28 w-28 items-center justify-center rounded-full border border-slate-200 bg-gradient-to-br from-white to-slate-50">
-                          <motion.div
-                            animate={{ scale: [1, 1.04, 1] }}
-                            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute inset-2 rounded-full border border-[#14b8a6]/30"
-                          />
-                          <div className="text-center">
-                            <div className="text-3xl font-semibold text-slate-900">92</div>
-                            <div className="text-[10px] uppercase tracking-[0.18em] text-slate-400">Score</div>
-                          </div>
+
+                        <div className="space-y-3">
+                          {alerts.map((alert) => (
+                            <div key={alert.label} className="flex items-center justify-between rounded-xl border border-white/10 bg-[#0d1426] px-3 py-2.5">
+                              <span className="text-[12px] text-slate-300">{alert.label}</span>
+                              <span className={`text-[12px] font-medium ${alert.tone}`}>{alert.value}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
-                      <div className="rounded-2xl border border-slate-200 bg-[#f8fbff] p-4">
-                        <div className="mb-3 flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                          <Bot className="h-3.5 w-3.5 text-[#3b82f6]" />
-                          AI insight
+                      <div className="rounded-2xl border border-[#7b91ff]/20 bg-gradient-to-br from-[#7b91ff]/12 to-[#5eead4]/10 p-4">
+                        <div className="mb-2 flex items-center gap-2 text-[#dfe7ff]">
+                          <Bot className="h-4 w-4 text-[#7b91ff]" />
+                          <span className="text-[12px] uppercase tracking-[0.18em]">AI insight</span>
                         </div>
-                        <p className="text-sm leading-6 text-slate-600">
-                          “Nulls are concentrated in the customer email field. Suggested normalization is ready to apply.”
+                        <p className="text-sm leading-6 text-slate-200">
+                          “AI detected inconsistencies and suggests normalization for the email and billing columns.”
                         </p>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                    <div className="mb-3 flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                      <span>Data health trend</span>
+                      <span className="text-[#7ee0d6]">+18.3%</span>
+                    </div>
+
+                    <div className="h-28 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="qualityFill" x1="0" x2="0" y1="0" y2="1">
+                              <stop offset="0%" stopColor="#7b91ff" stopOpacity={0.55} />
+                              <stop offset="100%" stopColor="#7b91ff" stopOpacity={0.05} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid stroke="rgba(148,163,184,0.12)" vertical={false} />
+                          <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} />
+                          <YAxis hide domain={[50, 100]} />
+                          <Tooltip
+                            cursor={{ stroke: "rgba(148,163,184,0.25)" }}
+                            contentStyle={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12 }}
+                          />
+                          <Area type="monotone" dataKey="value" stroke="#7b91ff" strokeWidth={3} fill="url(#qualityFill)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
                 </div>
