@@ -1,0 +1,18 @@
+name,version,private,scripts,dependencies,devDependencies
+datamedic-ai,0.1.0,True,next dev,,
+datamedic-ai,0.1.0,True,next build,,
+datamedic-ai,0.1.0,True,next start,,
+datamedic-ai,0.1.0,True,eslint,,
+datamedic-ai,0.1.0,True,,^13.1.1,
+datamedic-ai,0.1.0,True,,^1.34.0,
+datamedic-ai,0.1.0,True,,16.3.3,
+datamedic-ai,0.1.0,True,,19.2.8,
+datamedic-ai,0.1.0,True,,19.2.8,
+datamedic-ai,0.1.0,True,,,^4
+datamedic-ai,0.1.0,True,,,^20
+datamedic-ai,0.1.0,True,,,^19
+datamedic-ai,0.1.0,True,,,^19
+datamedic-ai,0.1.0,True,,,^9
+datamedic-ai,0.1.0,True,,,16.3.3
+datamedic-ai,0.1.0,True,,,^4
+datamedic-ai,0.1.0,True,,,^5

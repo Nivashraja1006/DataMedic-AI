@@ -1,0 +1,10 @@
+customer_id,email,phone,score,segment
+C001,a@example.com,+1 555 123 4567,95,A
+C002,b@example.com,+1 555 987 6543,88,A
+C003,invalid,+1 555 111 1111,72,B
+C004,d@example.com,+1 555 222 2222,65,B
+C005,,+1 555 333 3333,,A
+C006,f@example.com,,77,A
+C007,g@example.com,+1 555 444 4444,82,B
+C008,h@example.com,+1 555 555 5555,101,A
+C009,i@example.com,+1 555 666 6666,62,B

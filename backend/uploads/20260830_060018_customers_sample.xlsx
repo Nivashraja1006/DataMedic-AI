@@ -1,0 +1,215 @@
+customer_id,full_name,email,phone,signup_date,region,lifetime_value,last_login_days
+139,Priya Kim,priya.kim@gmail.com,+1 524 335 7337,2026-06-18,LATAM,1129.14,20
+66,Ingrid Mueller,ingrid.mueller@outlook.com,,2025-10-02,apac,1335.37,146
+96,Mary Costa,mary.costa@yahoo.com,302.897.3252,2024-02-30,Latam,263.86,146
+23,Kenji Andersen,kenji.andersen@yahoo.com,(997) 635-4585,2026-01-18,APAC ,845.66,286
+64,Fatima Hassan,fatima.hassan@outlook.com,646-803-7560,2026-05-24,,365.44,99
+47,Ingrid Kim,ingrid.kim@yahoo.com,461.882.1153,2026-05-22,APAC ,644.96,217
+98,Marcus Dubois,marcus.dubois@yahoo.com,315-538-3662,2025-12-06,N.A.,919.2,327
+12,James Andersen,james.andersen@company.co,358.394.5861,2023-10-24,,643.02,271
+3,Olivia Hassan,olivia.hassan@outlook.com,(877) 433-5741,2024-02-13,,1066.12,349
+83,Priya Silva,priya.silva@yahoo.com,-,2024-10-03,latam,1381.6,294
+25,Noah Dubois,noah.dubois@yahoo.com,265-624-7678,2026-07-02,Latam,613.13,391
+103,Chloe Patel,chloe.patel@company.co,984-856-7887,2026-08-28,Latam,689.77,68
+97,Chloe Patel,chloe.patel@yahoo.com,(379) 627-3880,2023-07-26,,932.53,171
+75,Olivia Chen,olivia.chen@,811.748.1269,2024-12-05,apac,0.0,43
+116,Mia Mueller,mia.mueller@yahoo.com,(712) 963-6666,2026-04-27,Latam,934.59,251
+163,Grace Silva,grace.silva@company.co,842-351-5225,2023-02-13,N.A.,,358
+158,Fatima Tanaka,fatima.tanaka@company.co,791.866.4695,2023-01-10,,1000.06,374
+171,Tom Kim,tom.kim@company.co,(871) 709-5843,2026-07-13,Emea,481.98,243
+86,Liam Silva,liam.silva@company.co,-,2025-08-08,Latam,629.33,212
+110,Aisha Okafor,aisha.okafor@company.co,579-520-7781,2024-12-05,Latam,791.71,125
+133,Diego Patel,diego.patel@gmail.com,+1 665 699 6362,2023-12-15,,416.32,108
+165,Elena Andersen,elena.andersen@outlook..com,+1 581 220 6535,2025-05-09,Apac,1186.08,164
+81,Sofia Okafor,sofia.okafor@yahoo.com,+1 455 316 1424,2026-09-13,apac,736.52,313
+193,Zara Hassan,zara.hassan@yahoo.com,(391) 377-9418,2023-07-09,EMEA,901.36,363
+118,Liam Chen,liam.chen@yahoo.com,305.226.2468,2023-10-20,LATAM,375.9,286
+185,Aisha Smith,aisha.smith@company.co,(818) 833-5990,2024-11-22,N.A.,735.08,169
+198,James Andersen,james.andersen@gmail.com,(917) 274-6860,2023-05-26,apac,878.42,338
+162,Mia Johnson,mia.johnson@company.co,786.441.8803,2026-12-02,EMEA,1119.09,85
+100,Sofia Kim,sofia.kim@gmail.com,+1 906 320 5833,2024-04-05,latam,730.86,241
+89,Olivia Ivanov,olivia.ivanov@company.co,,2025-12-12,,618.69,283
+212,Carlos Dubois ,carlos.dubois@company.co,(653) 763-2604,2023-02-25,Emea,643.9,30
+105,Mary Tanaka,mary.tanaka@gmail.com,,2023-04-24,LATAM,758.71,71
+61,Lucas Silva,lucas.silva@company.co,+1 995 781 2391,2024-03-25,apac,637.91,212
+129,Lucas Ivanov,lucas.ivanov@company.co,371.284.1505,2024-05-02,,857.87,253
+102,Lucas Okafor,lucas.okafor@company.co,(772) 673-6049,,emea,660.15,277
+194,Mary Garcia,mary.garcia@gmail.com,+1 702 786 6866,2025-09-08,Apac,346.62,113
+79,Yuki Hassan,yuki.hassan@yahoo.com,(535) 876-5843,2026-03-23,LATAM,854.87,222
+58,Zara Chen,zara.chen@outlook.com,903-685-2099,2023-02-14,,702.5,168
+117,Mia Andersen,mia.andersen@company.co,930-275-2344,2026-12-26,Latam,806.81,227
+10,Aisha Silva,aisha.silva@company.co,394.296.2588,2025-07-14,APAC,1026.17,55
+95,Tom Garcia,tom.garcia@outlook.com,,2026-04-07,na,671.0,300
+213,Marcus  Brown,,(275) 750-4492,2024-06-03,N.A.,92.95,313
+107,Elena Andersen,elena.andersen@outlook.com,+1 585 388 9813,2024-05-28,LATAM,1536.75,68
+134,Noah Brown,noah.brown@yahoo.com,+1 898 980 1793,2026-01-04,Emea,999.97,352
+126,Fatima Tanaka,fatima.tanaka@yahoo.com,(921) 419-4371,2023-10-04,Emea,1652.37,250
+59,Yuki Rossi,yuki.rossi@company.co,+1 814 519 6761,2024-03-22,apac,945.88,293
+67,Nadia Patel,nadia.patel@company.co,(660) 785-4084,2026-09-05,LATAM,792.64,43
+167,Ben Silva,ben.silva@yahoo.com,-,2025-06-27,latam,1132.38,250
+15,Grace Costa,grace.costaoutlook.com,(309) 960-3546,2024-12-11,na,164.53,47
+28,Omar Tanaka,omar.tanaka@gmail.com,(558) 429-2124,2023-01-08,Apac,962.77,111
+41,Ingrid Ivanov,ingrid.ivanov@gmail.com,+1 648 915 8941,2024-12-06,APAC ,1100.62,236
+46,Priya Okafor,priya.okafor@outlook.com,,2025-07-05,latam,546.46,312
+161,Fatima Rossi,fatima.rossi@outlook.com,,2024-05-19,APAC,449.62,387
+32,Fatima Ivanov,fatima.ivanov@outlook.com,+1 769 210 9464,2023-04-24,emea,1523.87,8
+166,Yuki Hassan,yuki.hassan@yahoo.com,958.696.9462,2023-09-26,na,976.86,never
+132,Nadia Costa,nadia.costa@gmail.com,260.483.3078,2024-04-05,emea,846.05,321
+33,Emma Andersen,emma.andersen@outlook.com,+1 635 963 6419,2026-05-10,Apac,814.87,353
+14,Marcus Brown,,(275) 750-4492,2024-06-03,N.A.,92.95,313
+130,Priya Park,priya.park@outlook.com,759.423.7965,2024-05-28,Latam,628.68,60
+144,Mary Andersen,mary.andersen@company.co,+1 535 288 8483,2024-02-30,na,890.16,252
+141,Chloe Tanaka,chloe.tanaka@gmail.com,322-212-3248,2024-08-12,,906.43,375
+29,Liam Rossi,liam.rossi@gmail.com,+1 310 792 1420,2026-07-23,EMEA,591.76,61
+19,Liam Rossi,liam.rossi@company.co,+1 228 318 5279,2025-01-04,na,474.95,59
+35,Ravi Brown,ravi.brown@company.co,+1 689 316 2070,2023-10-21,EMEA,1132.57,127
+122,Grace Tanaka,grace.tanaka@yahoo.com,932-633-7176,2026-10-13,latam,474.43,274
+16,Omar Nguyen,omar.nguyen@outlook..com,764.922.8007,2023-02-23,apac,606.33,157
+99,Omar Tanaka,omar.tanaka@gmail.com,,2024-01-09,Latam,821.94,5
+59,Yuki Rossi,yuki.rossi@company.co,+1 814 519 6761,2024-03-22,apac,945.88,293
+37,Fatima Smith,fatima.smith@company.co,+1 919 664 2166,2025-11-19,Emea,899.37,136
+170,Priya Smith,priya.smith@outlook.com,+1 505 900 2771,2025-05-21,N.A.,533.58,96
+191,Fatima Brown,fatima.brown@yahoo.com,+1 408 971 9866,2026-02-20,emea,650.32,356
+52,Ingrid Kim,ingrid.kim@company.co,319.343.1742,2025-08-04,Emea,673.67,276
+180,Robert Chen,robert.chen@yahoo.com,+1 675 251 2635,2023-05-12,N.A.,1853.66,never
+159,Ben Patel,ben.patel@company.co,821-644-3573,2025-04-07,na,367.3,292
+209,Wei  Park,wei.park@yahoo.com,+1 274 582 7481,2025-05-11,emea,931.37,332
+192,Elena Johnson,elena.johnson@company.co,+1 765 255 1212,2024-10-28,LATAM,1145.43,386
+146,Mary Garcia,mary.garcia@gmail.com,917.581.8511,2023-10-04,LATAM,1117.09,66
+148,Tom Silva,tom.silva@company.co,902-511-1660,2025-03-03,N.A.,318.23,89
+106,Olivia Kim,olivia.kim@outlook.com,+1 442 509 3347,2024-07-10,emea,973.54,176
+149,Ahmed Okafor,ahmed.okafor@yahoo.com,324-212-2010,2024-03-07,na,1018.34,132
+38,Robert Johnson,robert.johnson@outlook.com,+1 649 327 8679,2026-05-17,LATAM,75.33,309
+142,Tom Smith,tom.smith@company.co,,2025-01-16,Emea,1316.71,345
+85,Nadia Patel,nadia.patel@outlook.com,(714) 856-3762,2024-03-22,na,512.77,328
+183,Lucas Park,lucas.park@yahoo.com,+1 731 735 2560,2024-08-12,LATAM,413.06,never
+109,Nadia Mueller,nadia.mueller@gmail.com,(964) 972-8846,2024-07-08,N.A.,917.87,184
+50,Olivia Mueller,olivia.mueller@yahoo.com,+1 743 713 5465,2025-08-26,,150.04,115
+121,Marcus Ivanov,marcus.ivanov@yahoo.com,573.316.4273,2024-11-25,latam,1120.59,35
+6,Grace Tanaka,grace.tanaka@company.co,+1 766 211 2876,2025-11-11,LATAM,731.03,134
+18,Nadia Kim,nadia.kim@gmail.com,,2026-06-10,EMEA,939.41,35
+147,Liam Mueller,liam.mueller@company.co,+1 663 478 4827,2024-03-25,Apac,349.96,61
+181,Elena Khan,elena.khan@company.co,(581) 550-3996,2026-08-09,Latam,1057.75,356
+190,Kenji Khan,kenji.khan@outlook.com,796.784.7839,2025-07-26,APAC,244.36,136
+114,Elena Patel,elena.patel@gmail.com,257.852.1154,2023-08-28,na,1756.03,21
+87,Carlos Mueller,carlos.mueller@outlook.com,+1 608 333 7070,2023-06-08,N.A.,1167.85,196
+63,Yuki Khan,yuki.khan@yahoo.com,+1 273 606 1693,2026-02-28,latam,399.59,
+65,Sofia Rossi,sofia.rossi@yahoo.com,377-816-3504,2023-03-25,latam,1128.76,289
+27,Diego Garcia,diego.garcia@gmail.com,(285) 858-8022,2026-03-02,,382.62,142
+135,Ben Brown,ben.brown@outlook.com,(580) 880-3711,2025-12-23,latam,470.62,39
+42,Marcus Garcia,marcus.garcia@outlook.com,683.449.8483,2026-04-20,EMEA,885.12,259
+53,Zara Garcia,zara.garcia@gmail.com,+1 233 906 7070,2026-04-28,na,562.77,141
+187,Priya Nguyen,priya.nguyen@yahoo.com,668-395-6536,2026-01-21,APAC ,999.83,unknown
+82,Chloe Ivanov,chloe.ivanov@yahoo.com,289.898.6236,2023-09-18,,955.7,185
+8,Ravi Patel,ravi.patel@company.co,331-875-8787,2024-05-17,LATAM,1111.63,365
+92,Yuki Park,yuki.park@gmail.com,938-252-8871,2026-03-27,APAC,1188.09,211
+188,Mary Dubois,mary.dubois@company.co,908-792-3845,2024-02-13,na,792.33,354
+172,Elena Rossi,elena.rossi@yahoo.com,500-299-8713,2025-12-26,emea,509.99,114
+71,Fatima Khan,fatima.khan@yahoo.com,-,2024-08-20,LATAM,957.33,240
+179,Ingrid Silva,ingrid.silva@yahoo.com,240-761-9132,,APAC,719.43,46
+151,Liam Nguyen,liam.nguyen@yahoo.com,862-502-9173,2026-01-03,Emea,915.19,322
+9,Elena Rossi,elena.rossi@company.co,+1 221 802 4770,2023-02-23,EMEA,641.6,121
+115,Ben Park,ben.park@gmail.com,+1 756 777 1539,2025-01-07,LATAM,746.9,199
+80,Grace Johnson,grace.johnson@company.co,231-346-8179,2023-04-25,N.A.,64.72,230
+200,Olivia Silva,olivia.silva@outlook.com,364-388-4617,2025-04-04,APAC ,385.67,128
+140,Grace Andersen,grace.andersen@company.co,484-285-6077,2024-03-18,apac,352.27,29
+30,Ravi Johnson,ravi.johnson@company.co,-,31-13-2024,APAC ,709.16,362
+4,Ingrid Khan,ingrid.khan@yahoo.com,901-532-1916,2023-06-13,emea,1398.75,202
+40,Elena Chen,elena.chen@outlook.com,978.763.1601,2025-05-11,latam,9800.75,96
+51,Zara Andersen,zara.andersen@outlook.com,+1 749 326 8451,2025-10-13,,943.15,287
+78,Mary Silva,mary.silva@gmail.com,(576) 647-7553,2026-06-06,Latam,706.38,372
+214,Noah Tanaka ,noah.tanaka@company.co,997-282-8988,2024-06-21,Latam,949.64,81
+112,Yuki Garcia,yuki.garcia@yahoo.com,717-666-7114,2026-11-16,LATAM,809.92,unknown
+127,Marcus Mueller,marcus.mueller@company.co,832.376.5873,2023-11-05,Emea,443.6,198
+55,Ingrid Smith,ingrid.smith@yahoo.com,312-876-1422,2025-04-19,Emea,1211.78,381
+123,Chloe Patel,chloe.patel@yahoo.com,(776) 860-7547,2025-07-04,,1353.06,294
+91,Grace Ivanov,grace.ivanov@yahoo.com,+1 827 526 3662,2025-10-11,latam,,169
+175,Tom Patel,tom.patel@company.co,592.204.1618,2025-01-11,EMEA,925.14,355
+44,Grace Andersen,grace.andersen@yahoo.com,-,2026-02-17,Apac,705.58,240
+154,Carlos Ivanov,carlos.ivanov@yahoo.com,,,EMEA,908.26,165
+49,Zara Ivanov,zara.ivanov@outlook.com,+1 424 851 4115,2024-11-04,apac,950.57,67
+164,Lucas Tanaka,lucas.tanaka@yahoo.com,(308) 776-2654,2025-07-09,latam,508.14,73
+60,Yuki Dubois,yuki.dubois@gmail.com,+1 229 384 5477,2025-06-12,emea,1190.71,15
+54,Priya Okafor,priya.okafor@yahoo.com,(251) 541-4990,2024-02-27,emea,1052.44,75
+21,Wei Silva,wei.silva@company.co,+1 615 761 1006,2024-07-26,N.A.,1376.95,376
+125,Priya Okafor,priya.okafor@company.co,(223) 551-2791,2024-12-08,Emea,1043.01,207
+41,Ingrid Ivanov,ingrid.ivanov@gmail.com,+1 648 915 8941,2024-12-06,APAC ,1100.62,236
+199,Fatima Dubois,fatima.dubois@company.co,+1 849 347 5883,2025-01-18,EMEA,842.12,280
+77,Tom Okafor,tom.okafor@company.co,(933) 994-8498,2024-01-26,apac,853.08,278
+108,Liam Silva,liam.silva@gmail.com,(748) 941-4120,2026-11-20,Apac,886.34,111
+169,Nadia Smith,nadia.smith@yahoo.com,(429) 458-6004,2025-07-13,Latam,726.75,319
+13,Lucas Patel,lucas.patel@gmail.com,613-322-5033,2023-10-03,N.A.,911.95,202
+17,Chloe Johnson,chloe.johnson@yahoo.com,+1 998 773 7658,2024-04-28,Emea,435.12,210
+48,Diego Brown,diego.brown@company.co,785.567.5847,2025-01-27,,1221.71,25
+157,Priya Ivanov,priya.ivanov@gmail.com,851-290-6500,2025-04-08,N.A.,1528.99,224
+120,Diego Chen,diego.chen@gmail.com,537.650.6484,2024-05-11,Emea,1105.73,149
+22,Robert Brown,robert.brown@outlook.com,888-517-4680,2024-01-02,latam,734.21,322
+174,Noah Tanaka,noah.tanaka@company.co,997-282-8988,2024-06-21,Latam,949.64,81
+131,Emma Silva,emma.silva@outlook.com,369.830.3281,2024-01-19,na,230.75,148
+196,Mia Brown,mia.brown@,528-726-2349,2024-09-18,Apac,966.42,217
+74,Omar Mueller,omar.mueller@yahoo.com,912.342.8685,2023-02-01,emea,1414.56,397
+31,Fatima Costa,fatima.costa@outlook.com,676.646.5397,2024-02-09,Emea,591.35,253
+156,Kenji Dubois,kenji.dubois@outlook.com,587-514-5825,2023-12-19,Apac,548.55,113
+34,Carlos Ivanov,carlos.ivanov@outlook.com,+1 432 569 3939,2024-05-02,na,418.07,52
+155,Wei Park,wei.park@yahoo.com,+1 274 582 7481,2025-05-11,emea,931.37,332
+178,Liam Ivanov,liam.ivanov@yahoo.com,+1 630 877 2654,2025-10-20,LATAM,1372.34,54
+189,Liam Andersen,liam.andersen@outlook.com,816.916.9393,2025-12-24,EMEA,498.22,344
+124,Sofia Andersen,sofia.andersen@yahoo.com,,2023-02-27,Emea,287.3,247
+211,Emma Costa ,,(632) 910-3165,2024-07-03,APAC,1408.98,396
+101,Grace Silva,grace.silva@gmail.com,+1 279 777 2838,2024-10-18,na,282.16,250
+150,Robert Smith,robert.smith@yahoo.com,294-539-3007,2026-01-06,latam,9800.75,109
+199,Fatima Dubois,fatima.dubois@company.co,+1 849 347 5883,2025-01-18,EMEA,842.12,280
+210,Zara Hassan ,zara.hassan@yahoo.com,(391) 377-9418,2023-07-09,EMEA,901.36,363
+195,Elena Mueller,elena.mueller@outlook.com,774.970.1144,2025-08-08,EMEA,885.81,58
+62,Tom Costa,tom.costa@company.co,739.883.6053,2026-10-02,,749.45,unknown
+36,Tom Tanaka,tom.tanaka@yahoo.com,504.802.8025,2023-10-24,emea,356.08,88
+11,Carlos Dubois,carlos.dubois@company.co,(653) 763-2604,2023-02-25,Emea,643.9,30
+185,Aisha Smith,aisha.smith@company.co,(818) 833-5990,2024-11-22,N.A.,735.08,169
+72,Carlos Rossi,carlos.rossi@company.co,714.740.7859,2024-10-05,APAC ,1404.45,264
+5,Marcus Okafor,marcus.okafor@yahoo.com,+1 964 798 8019,2026-06-08,emea,731.02,78
+94,Zara Nguyen,zara.nguyen@yahoo.com,+1 430 504 5735,2026-06-16,N.A.,695.49,202
+160,Aisha Garcia,aisha.garcia@,404.299.1421,2025-02-16,N.A.,1069.49,328
+119,Emma Park,emma.park@company.co,+1 704 349 2036,2025-07-10,apac,1254.27,304
+145,Tom Silva,tom.silva@yahoo.com,(438) 754-6675,2023-06-01,latam,918.76,121
+2,Nadia Smith,nadia.smith@yahoo.com,420-981-6514,2026-02-12,,767.46,193
+84,Noah Patel,noah.patel@outlook.com,986-332-8088,2023-02-17,EMEA,623.06,265
+103,Chloe Patel,chloe.patel@company.co,984-856-7887,2026-08-28,Latam,689.77,68
+88,Yuki Kim,yuki.kim@yahoo.com,+1 394 981 3610,2026-08-10,APAC ,944.93,180
+138,Yuki Mueller,yuki.mueller@yahoo.com,-,2023-11-10,emea,697.62,122
+5,Marcus Okafor,marcus.okafor@yahoo.com,+1 964 798 8019,2026-06-08,emea,731.02,78
+39,Robert Kim,robert.kim@gmail.com,+1 790 241 3870,2026-05-06,latam,315.29,209
+96,Mary Costa,mary.costa@yahoo.com,302.897.3252,2024-02-30,Latam,263.86,146
+35,Ravi Brown,ravi.brown@company.co,+1 689 316 2070,2023-10-21,EMEA,1132.57,127
+113,Elena Tanaka,elena.tanaka@yahoo.com,,2025-06-09,apac,842.89,356
+182,Nadia Khan,nadia.khan@company.co,825-588-6875,2024-08-16,Latam,494.28,360
+184,Lucas Ivanov,lucas.ivanov@yahoo.com,538-484-1824,2026-07-27,Latam,1003.34,228
+153,Emma Khan,emma.khan@yahoo.com,(982) 424-7363,2024-03-08,na,561.59,288
+57,Wei Patel,wei.patel@outlook.com,+1 664 717 8048,2023-11-21,Emea,501.1,232
+70,Robert Tanaka,robert.tanaka@gmail.com,549-984-8967,2024-03-03,APAC,574.85,305
+45,Liam Mueller,liam.mueller@company.co,524.841.8994,2023-10-03,,258.16,324
+20,Ravi Silva,,572-641-2146,2025-10-11,apac,283.32,356
+7,Tom Khan,tom.khan@gmail.com,356-582-3646,2023-10-11,apac,1420.1,29
+56,Diego Rossi,diego.rossi@gmail.com,(944) 874-9543,2023-01-16,latam,1173.89,41
+76,Sofia Patel,sofia.patel@gmail.com,582.459.1266,2023-06-08,apac,1132.32,329
+1,Marcus Chen,marcus.chen@outlook..com,(804) 632-1520,2024-04-17,emea,1008.75,301
+173,Olivia Tanaka,olivia.tanaka@outlook.com,320.681.1879,2023-08-07,latam,790.7,70
+136,Emma Costa,,(632) 910-3165,2024-07-03,APAC,1408.98,396
+128,Wei Park,wei.park@yahoo.com,768-370-9022,2024-06-27,apac,604.81,196
+177,Zara Garcia,zara.garcia@gmail.com,+1 928 866 1612,2025-09-20,APAC,15230.5,194
+69,Elena Hassan,elena.hassan@outlook.com,+1 517 871 7421,2023-05-18,,957.42,350
+168,Fatima Ivanov,fatima.ivanov@outlook.com,+1 966 905 2480,2026-01-06,EMEA,1540.78,209
+137,Nadia Garcia,nadia.garcia@yahoo.com,650-559-4490,2024-07-20,EMEA,522.36,373
+43,James Brown,james.brown@company.co,553.540.9903,2025-04-23,LATAM,776.05,242
+111,Marcus Mueller,marcus.mueller@company.co,671.372.6770,2026-03-18,APAC,90.87,24
+90,Ahmed Costa,ahmed.costa@outlook.com,(331) 299-7453,2025-09-12,emea,1015.04,70
+73,Olivia Patel,olivia.patel@outlook.com,293.427.8391,2023-07-02,,806.39,163
+24,Tom Okafor,tom.okafor@company.co,961-686-8373,2024-11-09,latam,278.6,120
+143,Emma Costa,emma.costa@gmail..com,383-236-7870,2024-07-24,apac,209.16,114
+186,Ingrid Hassan,ingrid.hassan@outlook.com,202-549-6818,2025-09-17,APAC,1091.32,380
+93,Yuki Costa,yuki.costa@company.co,(922) 341-9498,2025-11-16,,553.22,346
+104,Sofia Chen,sofia.chen@company.co,203-974-1372,2026-11-24,LATAM,515.13,371
+152,Mia Smith,mia.smith@outlook.com,+1 779 714 6269,2024-01-11,apac,951.65,392
+68,Fatima Johnson,fatima.johnson@company.co,572-581-5634,2025-11-20,,1201.34,129
+26,Aisha Smith,aisha.smith@outlook.com,751.965.9947,2024-08-08,LATAM,862.15,370
+197,Carlos Dubois,carlos.dubois@company.co,224-670-6434,2023-01-06,Apac,484.13,207
+176,Olivia Garcia,olivia.garcia@outlook.com,+1 497 666 9524,2025-07-22,N.A.,1134.33,never
