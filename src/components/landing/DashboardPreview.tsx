@@ -33,9 +33,9 @@ export default function DashboardPreview() {
     <motion.div
       className="relative mx-auto w-full max-w-[560px]"
       initial={{ opacity: 0, y: 18, rotateX: 6 }}
-      animate={{ opacity: 1, y: -8, rotateX: 0 }}
-      transition={{ duration: 5.5, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
-      whileHover={{ y: -8, rotateX: 3, rotateY: -4 }}
+      animate={{ opacity: 1, y: 0, rotateX: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      whileHover={{ y: -4, rotateX: 2, rotateY: -2 }}
       style={{ transformStyle: "preserve-3d" }}
       layout={false}
     >
@@ -68,8 +68,8 @@ export default function DashboardPreview() {
 
               <div className="relative flex justify-center">
                 <motion.div
-                  animate={{ scale: 1.03, boxShadow: "0 0 18px rgba(123,145,255,0.18)" }}
-                  transition={{ duration: 3.8, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                   className="relative flex h-36 w-36 items-center justify-center rounded-full border border-white/10 bg-[#0f172a]"
                 >
                   <div className="absolute inset-4 rounded-full border border-[#8aa8ff]/30" />

@@ -137,19 +137,6 @@ const slides = [
 
 export default function InsightCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-
-  useEffect(() => {
-    if (isPaused) {
-      return;
-    }
-
-    const interval = window.setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % slides.length);
-    }, 4000);
-
-    return () => window.clearInterval(interval);
-  }, [isPaused]);
 
   const currentSlide = slides[activeIndex];
 
@@ -158,11 +145,7 @@ export default function InsightCarousel() {
   };
 
   return (
-    <div
-      className="relative overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.03] p-4 shadow-[0_24px_90px_rgba(10,14,24,0.75)] backdrop-blur-md"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-    >
+    <div className="relative overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.03] p-4 shadow-[0_24px_90px_rgba(10,14,24,0.75)] backdrop-blur-md">
       <div className="mb-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-[#DDE6FF]">
           <Sparkles className="h-4 w-4 text-[#7B91FF]" />

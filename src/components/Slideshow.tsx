@@ -7,7 +7,7 @@ import { useAutoRotate } from "@/hooks/useAutoRotate";
 
 export type SlideItem = {
   title: string;
-  badge: string;
+badge: string;
   description: string;
   accent: string;
   content: Array<{ label: string; amount: number }>;
@@ -54,7 +54,7 @@ const defaultSlides: SlideItem[] = [
 ];
 
 export default function Slideshow({ slides = defaultSlides }: SlideshowProps) {
-  const { index, setIndex } = useAutoRotate(slides.length, 4000);
+  const { index, setIndex } = useAutoRotate(slides.length);
   const activeSlide = useMemo(() => slides[index], [index, slides]);
 
   return (

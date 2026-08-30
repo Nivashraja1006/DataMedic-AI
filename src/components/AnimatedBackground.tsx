@@ -10,10 +10,8 @@ export default function AnimatedBackground() {
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.14),transparent_25%),radial-gradient(circle_at_80%_20%,rgba(34,211,238,0.10),transparent_20%),radial-gradient(circle_at_50%_100%,rgba(168,85,247,0.10),transparent_25%)]" />
 
-      <motion.div
+      <div
         className="absolute inset-0 opacity-70"
-        animate={{ opacity: 0.7 }}
-        transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
         style={{
           backgroundImage:
             "linear-gradient(120deg, rgba(59,130,246,0.06), rgba(168,85,247,0.06), rgba(34,211,238,0.04), rgba(15,23,42,0.0))",
@@ -24,26 +22,10 @@ export default function AnimatedBackground() {
       <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(rgba(148,163,184,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.06) 1px, transparent 1px)", backgroundSize: "52px 52px" }} />
 
       <svg className="absolute inset-0 h-full w-full opacity-40" viewBox="0 0 1200 500" preserveAspectRatio="none" aria-hidden="true">
-        <motion.path
-          d={singleFlowLine}
-          fill="none"
-          stroke="rgba(156, 170, 255, 0.22)"
-          strokeWidth="1.2"
-          animate={{ x: 12, opacity: 0.28 }}
-          transition={{ duration: 16, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
-        />
+        <path d={singleFlowLine} fill="none" stroke="rgba(156, 170, 255, 0.22)" strokeWidth="1.2" />
       </svg>
 
-      <motion.div
-        className={`absolute rounded-full blur-2xl ${singleFloat.className}`}
-        animate={{ x: 18, y: -12, scale: 1.04 }}
-        transition={{
-          duration: singleFloat.duration,
-          ease: "easeInOut",
-          repeat: Infinity,
-          repeatType: "reverse",
-        }}
-      />
+      <div className={`absolute rounded-full ${singleFloat.className}`} style={{ filter: "blur(12px)" }} />
     </div>
   );
 }
