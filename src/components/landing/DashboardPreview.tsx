@@ -32,11 +32,12 @@ export default function DashboardPreview() {
   return (
     <motion.div
       className="relative mx-auto w-full max-w-[560px]"
-      initial={{ opacity: 0, y: 28, rotateX: 10 }}
-      animate={{ opacity: 1, y: [0, -8, 0], rotateX: 0 }}
-      transition={{ duration: 6, ease: [0.4, 0, 0.2, 1], repeat: Infinity, repeatType: "mirror" }}
+      initial={{ opacity: 0, y: 18, rotateX: 6 }}
+      animate={{ opacity: 1, y: -8, rotateX: 0 }}
+      transition={{ duration: 5.5, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
       whileHover={{ y: -8, rotateX: 3, rotateY: -4 }}
       style={{ transformStyle: "preserve-3d" }}
+      layout={false}
     >
       <div className="absolute -left-8 top-10 h-28 w-28 rounded-full bg-[#7b91ff]/15 blur-3xl" />
       <div className="absolute -right-10 bottom-6 h-36 w-36 rounded-full bg-[#8d6af7]/12 blur-3xl" />
@@ -67,8 +68,8 @@ export default function DashboardPreview() {
 
               <div className="relative flex justify-center">
                 <motion.div
-                  animate={{ scale: [1, 1.04, 1], boxShadow: ["0 0 0 rgba(123,145,255,0.1)", "0 0 18px rgba(123,145,255,0.18)", "0 0 0 rgba(123,145,255,0.1)"] }}
-                  transition={{ duration: 3.8, ease: [0.4, 0, 0.2, 1], repeat: Infinity }}
+                  animate={{ scale: 1.03, boxShadow: "0 0 18px rgba(123,145,255,0.18)" }}
+                  transition={{ duration: 3.8, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
                   className="relative flex h-36 w-36 items-center justify-center rounded-full border border-white/10 bg-[#0f172a]"
                 >
                   <div className="absolute inset-4 rounded-full border border-[#8aa8ff]/30" />

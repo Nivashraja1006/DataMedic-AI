@@ -30,8 +30,8 @@ export default function AnimatedBackground() {
 
       <motion.div
         className="absolute inset-0 opacity-70"
-        animate={{ backgroundPosition: ["0% 0%", "100% 50%", "0% 100%", "0% 0%"] }}
-        transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+        animate={{ opacity: [0.55, 0.72, 0.55] }}
+        transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
         style={{
           backgroundImage:
             "linear-gradient(120deg, rgba(59,130,246,0.08), rgba(168,85,247,0.08), rgba(34,211,238,0.06), rgba(15,23,42,0.0))",
@@ -49,14 +49,12 @@ export default function AnimatedBackground() {
             fill="none"
             stroke="rgba(156, 170, 255, 0.22)"
             strokeWidth="1.2"
-            animate={{
-              x: [0, 16, -10, 0],
-              opacity: [0.16, 0.34, 0.2, 0.16],
-            }}
+            animate={{ x: 14, opacity: 0.28 }}
             transition={{
               duration: 16 + index * 4,
-              ease: [0.4, 0, 0.2, 1],
+              ease: "easeInOut",
               repeat: Infinity,
+              repeatType: "reverse",
             }}
           />
         ))}
@@ -66,27 +64,20 @@ export default function AnimatedBackground() {
         <motion.div
           key={index}
           className={`absolute rounded-full blur-3xl ${blob.className}`}
-          animate={{
-            x: [0, 28, -24, 0],
-            y: [0, -18, 22, 0],
-            scale: [1, 1.12, 0.96, 1],
-          }}
+          animate={{ x: 18, y: -12, scale: 1.06 }}
           transition={{
             duration: blob.duration,
-            ease: [0.4, 0, 0.2, 1],
+            ease: "easeInOut",
             repeat: Infinity,
-            repeatType: "mirror",
+            repeatType: "reverse",
           }}
         />
       ))}
 
       <motion.div
         className="absolute inset-x-0 bottom-[-12%] h-48 bg-[radial-gradient(circle_at_center,rgba(95,117,255,0.12),transparent_55%)] blur-3xl"
-        animate={{
-          scaleX: [1, 1.18, 1],
-          opacity: [0.2, 0.35, 0.2],
-        }}
-        transition={{ duration: 15, ease: [0.4, 0, 0.2, 1], repeat: Infinity }}
+        animate={{ scaleX: 1.08, opacity: 0.26 }}
+        transition={{ duration: 15, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
       />
 
       {particles.map((particle) => (
@@ -100,16 +91,13 @@ export default function AnimatedBackground() {
             top: particle.top,
             boxShadow: "0 0 14px rgba(148, 163, 184, 0.28)",
           }}
-          animate={{
-            y: [0, -18, 0],
-            opacity: [0.12, 0.45, 0.12],
-            x: [0, 8, -6, 0],
-          }}
+          animate={{ y: -12, opacity: 0.38, x: 6 }}
           transition={{
             duration: particle.duration,
             delay: particle.delay,
-            ease: [0.4, 0, 0.2, 1],
+            ease: "easeInOut",
             repeat: Infinity,
+            repeatType: "reverse",
           }}
         />
       ))}

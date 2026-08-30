@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,7 +10,6 @@ import Navbar from "@/components/Navbar";
 import ChatWidget from "@/components/ChatWidget";
 import HeroText from "@/components/HeroText";
 import Slideshow from "@/components/Slideshow";
-import { useParallax } from "@/hooks/useParallax";
 import {
   AlertTriangle,
   ArrowRight,
@@ -180,26 +179,12 @@ function AnimatedPercent({ value }: { value: number }) {
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
-  const { transform } = useParallax(18);
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
-      const progress = maxScroll > 0 ? (window.scrollY / maxScroll) * 100 : 0;
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020617] text-[#EDF0F8]">
       <motion.div
         className="fixed left-0 top-0 z-[100] h-[2px] bg-gradient-to-r from-[#7b91ff] via-[#9a6bff] to-[#2fd9c4] shadow-[0_0_18px_rgba(123,145,255,0.7)]"
-        style={{ width: `${scrollProgress}%` }}
+        style={{ width: "58%" }}
       />
 
       <AnimatedBackground />
@@ -221,7 +206,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
             className="relative"
-            style={{ transform: `perspective(1200px) rotateX(${transform.rotateX}) rotateY(${transform.rotateY})` }}
+            style={{ transform: "perspective(1200px) rotateX(0deg) rotateY(0deg)" }}
           >
             <div className="absolute -left-8 top-8 h-28 w-28 rounded-full bg-[#7b91ff]/20 blur-3xl" />
             <div className="absolute -right-8 bottom-8 h-32 w-32 rounded-full bg-[#5eead4]/20 blur-3xl" />
