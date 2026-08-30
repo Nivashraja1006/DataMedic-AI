@@ -1,0 +1,142 @@
+"use client";
+
+import { motion, animate, useMotionValue, useTransform } from "framer-motion";
+import { useEffect } from "react";
+import { AlertTriangle, Bot, ShieldCheck } from "lucide-react";
+
+const metrics = [
+  { label: "Completeness", value: 94, color: "#7b91ff" },
+  { label: "Validity", value: 89, color: "#2fd9c4" },
+  { label: "Uniqueness", value: 82, color: "#a66bff" },
+];
+
+const alerts = [
+  { label: "Nulls", value: "2.4%", tone: "#60a5fa" },
+  { label: "Duplicates", value: "0.7%", tone: "#fbbf24" },
+  { label: "Outliers", value: "4.1%", tone: "#fb7185" },
+];
+
+function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const motionValue = useMotionValue(0);
+  const rounded = useTransform(motionValue, (latest) => `${Math.round(latest)}${suffix}`);
+
+  useEffect(() => {
+    const controls = animate(motionValue, value, { duration: 1.3, ease: "easeOut" });
+    return () => controls.stop();
+  }, [motionValue, value]);
+
+  return <motion.span style={{ display: "inline-block" }}>{rounded}</motion.span>;
+}
+
+export default function DashboardPreview() {
+  return (
+    <motion.div
+      className="relative mx-auto w-full max-w-[560px]"
+      initial={{ opacity: 0, y: 28, rotateX: 10 }}
+      animate={{ opacity: 1, y: 0, rotateX: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      whileHover={{ y: -8, rotateX: 3, rotateY: -4 }}
+      style={{ transformStyle: "preserve-3d" }}
+    >
+      <div className="absolute -left-8 top-10 h-28 w-28 rounded-full bg-[#7b91ff]/25 blur-3xl" />
+      <div className="absolute -right-10 bottom-6 h-36 w-36 rounded-full bg-[#2fd9c4]/18 blur-3xl" />
+
+      <div className="relative rounded-[32px] border border-white/10 bg-white/[0.03] p-4 shadow-[0_24px_90px_rgba(10,14,24,0.85)] backdrop-blur-md">
+        <div className="rounded-[28px] border border-white/10 bg-[#090f1b]/90 p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex gap-2">
+              {["#FF5F57", "#FFBD2E", "#28C840"].map((color) => (
+                <span key={color} className="h-3 w-3 rounded-full" style={{ background: color }} />
+              ))}
+            </div>
+            <div className="rounded-full border border-[#7b91ff]/35 bg-[#7b91ff]/10 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-[#dfe7ff]">
+              Live
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-[1.08fr_0.92fr]">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="mb-6 flex items-center justify-between text-[12px] text-slate-300">
+                <span>Dataset health</span>
+                <span className="text-[#34D399]">+18.3%</span>
+              </div>
+
+              <div className="relative flex justify-center">
+                <div className="relative flex h-36 w-36 items-center justify-center rounded-full border border-white/10 bg-[#0f172a] shadow-[0_0_32px_rgba(123,145,255,0.28)]">
+                  <div className="absolute inset-4 rounded-full border border-[#7b91ff]/40" />
+                  <div className="absolute inset-8 rounded-full border border-[#2fd9c4]/40" />
+                  <div className="text-center">
+                    <div className="text-4xl font-semibold text-white">
+                      <AnimatedCounter value={92} />
+                    </div>
+                    <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-slate-400">Score</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {metrics.map((metric) => (
+                  <div key={metric.label}>
+                    <div className="mb-1 flex items-center justify-between text-[11px] text-slate-300">
+                      <span>{metric.label}</span>
+                      <span>{metric.value}%</span>
+                    </div>
+                    <div className="h-2.5 rounded-full bg-white/5">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${metric.value}%` }}
+                        transition={{ duration: 1.1, ease: "easeOut" }}
+                        className="h-full rounded-full"
+                        style={{ background: metric.color }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="mb-3 flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                  <AlertTriangle className="h-3.5 w-3.5 text-[#fbbf24]" />
+                  Alerts
+                </div>
+
+                <div className="space-y-3">
+                  {alerts.map((alert) => (
+                    <div
+                      key={alert.label}
+                      className="flex items-center justify-between rounded-xl border border-white/10 bg-[#0d1426] px-3 py-2.5"
+                    >
+                      <span className="text-[12px] text-slate-300">{alert.label}</span>
+                      <span className="text-[12px] font-medium" style={{ color: alert.tone }}>
+                        {alert.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#7b91ff]/12 to-[#2fd9c4]/10 p-4">
+                <div className="mb-2 flex items-center gap-2 text-[#dfe7ff]">
+                  <Bot className="h-4 w-4 text-[#9a6bff]" />
+                  <span className="text-[12px] uppercase tracking-[0.18em]">AI insight</span>
+                </div>
+                <p className="text-sm leading-6 text-slate-200">
+                  “Customer emails appear inconsistent in 6 records. Suggested normalization is ready to apply.”
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-[#34d399]/20 bg-[#34d399]/8 p-3 text-[12px] text-[#c8f9e1]">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-[#34d399]" />
+                  Data quality baseline improved 18.3%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}

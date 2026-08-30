@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import math
 import os
 import re
 from pathlib import Path
@@ -14,6 +15,11 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from sklearn.ensemble import IsolationForest
 from werkzeug.utils import secure_filename
 from fuzzywuzzy import fuzz
+
+try:
+    import openai
+except Exception:  # pragma: no cover - optional dependency
+    openai = None
 
 app = Flask(__name__)
 CORS(app)
@@ -37,8 +43,37 @@ PHONE_PATTERN = re.compile(r"^[+\d][\d\s().-]{7,}$")
 users = {}
 datasets_store = {}
 
-EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-PHONE_PATTERN = re.compile(r"^[+\d][\d\s().-]{7,}$")
+
+def clean_numeric(value, default=0.0):
+    """Convert values to a finite float and never leak NaN or inf into JSON."""
+    try:
+        number = float(value)
+        if pd.isna(number) or not math.isfinite(number):
+            return float(default)
+        return float(number)
+    except (TypeError, ValueError):
+        return float(default)
+
+
+def sanitize_json(value):
+    """Recursively replace NaN/inf/None semantics with JSON-safe values."""
+    if isinstance(value, dict):
+        return {str(key): sanitize_json(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [sanitize_json(item) for item in value]
+    if isinstance(value, tuple):
+        return [sanitize_json(item) for item in value]
+    if isinstance(value, np.generic):
+        return sanitize_json(value.item())
+    if isinstance(value, (np.integer, np.floating)):
+        return sanitize_json(value.item())
+    if isinstance(value, float):
+        if pd.isna(value) or not math.isfinite(value):
+            return 0.0
+        return float(value)
+    if value is None:
+        return None
+    return value
 
 
 def safe_float(value, default=0.0):
@@ -61,6 +96,73 @@ def safe_divide(numerator, denominator, default=0.0):
         return float(default)
     result = numerator / denominator
     return safe_float(result, default)
+
+
+def local_ai_insight(frame, dataset_name="dataset"):
+    """Fallback insight engine when OpenAI is unavailable or not configured."""
+    try:
+        validate_dataset(frame)
+    except ValueError:
+        return "The uploaded dataset is empty or invalid. Please provide a valid CSV, Excel, or JSON file."
+
+    summary = summarize_dataset_analysis(frame)
+    issues = summary.get("issues", [])
+    row_count = max(len(frame), 1)
+    null_pct = summary.get("null_percent", 0)
+    duplicate_pct = summary.get("duplicate_percent", 0)
+    outlier_pct = summary.get("outlier_percent", 0)
+
+    if issues:
+        first_issue = issues[0]
+        issue_text = first_issue.get("title", "data quality issue")
+        return (
+            f"{dataset_name.title()} shows {issue_text.lower()} as the highest-priority issue. "
+            f"I recommend fixing missing values and duplicate rows first, then validating format consistency "
+            f"before using the file for modeling or reporting."
+        )
+
+    if null_pct > 12:
+        return f"{dataset_name.title()} has a significant missing-value rate. Consider imputation or row cleanup before modeling."
+    if duplicate_pct > 4:
+        return f"{dataset_name.title()} contains notable duplicate records. Remove duplicates to improve trust and model accuracy."
+    if outlier_pct > 8:
+        return f"{dataset_name.title()} includes several outliers that may reflect anomalies. Review them before finalizing the analysis."
+    if row_count < 50:
+        return f"{dataset_name.title()} is relatively small but structurally healthy. It is ready for quick review and downstream analysis."
+
+    return f"{dataset_name.title()} looks broadly healthy and stable. No critical quality issues were detected in the current scan."
+
+
+def generate_openai_insight(summary, dataset_name="dataset"):
+    """Generate a short AI insight using OpenAI when an API key is configured."""
+    if openai is None:
+        return None
+
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        return None
+
+    try:
+        client = openai.OpenAI(api_key=api_key)
+        prompt = (
+            f"You are a data quality analyst. Dataset name: {dataset_name}. "
+            f"Metrics: rows={summary.get('rows', 0)}, columns={summary.get('cols', 0)}, "
+            f"null_percent={summary.get('null_percent', 0)}, duplicate_percent={summary.get('duplicate_percent', 0)}, "
+            f"outlier_percent={summary.get('outlier_percent', 0)}, quality_score={summary.get('overall_score', 0)}. "
+            "Give a concise, actionable insight in 1 short paragraph."
+        )
+        response = client.responses.create(
+            model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+            input=prompt,
+        )
+
+        text = getattr(response, "output_text", None) or ""
+        if isinstance(text, str) and text.strip():
+            return text.strip()
+    except Exception:
+        return None
+
+    return None
 
 
 def validate_dataset(frame):
@@ -155,6 +257,7 @@ def profile_dataset(frame):
         })
 
     preview_data = frame.head(10).replace({np.nan: None, np.inf: None, -np.inf: None})
+    safe_preview = sanitize_json(preview_data.to_dict(orient="records"))
     return {
         "rows": int(len(frame)),
         "columns": int(len(frame.columns)),
@@ -162,8 +265,8 @@ def profile_dataset(frame):
         "missing_values": missing,
         "duplicate_rows": duplicate,
         "outliers": outlier_count,
-        "columns_profile": columns,
-        "preview": preview_data.to_dict(orient="records"),
+        "columns_profile": sanitize_json(columns),
+        "preview": safe_preview,
     }
 
 
@@ -217,7 +320,7 @@ def summarize_dataset_analysis(frame):
     if not insights:
         insights.append("The dataset is structurally healthy with no major anomalies detected in the current scan.")
 
-    return {
+    summary = {
         "overall_score": round(overall_score, 1),
         "null_percent": float(safe_float(null_percent, 0.0)),
         "duplicate_percent": float(safe_float(duplicate_percent, 0.0)),
@@ -226,11 +329,12 @@ def summarize_dataset_analysis(frame):
         "missing_values": int(profile["missing_values"]),
         "duplicate_rows": int(profile["duplicate_rows"]),
         "outliers": int(profile["outliers"]),
-        "issues": issues,
-        "profile": profile,
-        "insights": insights,
+        "issues": sanitize_json(issues),
+        "profile": sanitize_json(profile),
+        "insights": sanitize_json(insights),
         "status": "completed" if overall_score >= 70 else "needs-review",
     }
+    return sanitize_json(summary)
 
 
 def detect_all_issues(frame):
@@ -472,9 +576,18 @@ def upload_dataset():
         # Create dataset record
         dataset_id = len(datasets_store)
         analysis = summarize_dataset_analysis(df)
+        dataset_name = request.form.get('name', file.filename)
+        ai_summary = generate_openai_insight({
+            'rows': len(df),
+            'cols': len(df.columns),
+            'null_percent': analysis.get('null_percent', 0),
+            'duplicate_percent': analysis.get('duplicate_percent', 0),
+            'outlier_percent': analysis.get('outlier_percent', 0),
+            'overall_score': analysis.get('overall_score', 0),
+        }, dataset_name) or local_ai_insight(df, dataset_name)
         dataset = {
             'id': dataset_id,
-            'name': request.form.get('name', file.filename),
+            'name': dataset_name,
             'file_path': filepath,
             'file_type': ext,
             'rows': len(df),
@@ -492,6 +605,7 @@ def upload_dataset():
                 'validity_score': analysis['validity_score'],
                 'outlier_percent': analysis['outlier_percent'],
                 'insights': analysis['insights'],
+                'ai_insight': ai_summary,
             },
             'versions': []
         }
@@ -664,13 +778,35 @@ def copilot():
     question = body.get("question", "").lower()
     dataset_id = body.get("dataset_id")
     
-    # Default answer
     default_answer = "Based on the dataset profile, I recommend: 1) Address high-severity missing values first, 2) Remove or merge duplicate records, 3) Validate format-related issues (emails, phones), 4) Investigate statistical outliers"
-    
-    # Context-aware answers based on keyword matching
+
+    if dataset_id is not None and dataset_id in datasets_store:
+        dataset = datasets_store[dataset_id]
+        current_analysis = dataset.get('analysis', {})
+        if current_analysis.get('ai_insight'):
+            default_answer = current_analysis['ai_insight']
+
     if not question:
         return jsonify({"answer": default_answer}), 200
-    
+
+    if openai is not None and os.environ.get("OPENAI_API_KEY"):
+        try:
+            client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+            instruction = (
+                "You are a data quality analyst. Answer in short, measurable, practical steps. "
+                f"Context: {question}."
+            )
+            response = client.responses.create(
+                model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+                input=instruction,
+            )
+            response_text = getattr(response, "output_text", None) or ""
+            if isinstance(response_text, str) and response_text.strip():
+                return jsonify({"answer": response_text.strip()}), 200
+        except Exception:
+            pass
+
+    # Context-aware answers based on keyword matching
     if "why" in question and "low" in question:
         return jsonify({"answer": "Your data quality score is low due to: missing values, duplicates, and format inconsistencies. Start by profiling your data to see the specific issues."}), 200
     

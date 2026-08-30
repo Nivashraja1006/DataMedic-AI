@@ -2,16 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 
 const navItems = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "#about" },
+  { label: "Home", href: "#home" },
   { label: "Features", href: "#features" },
+  { label: "How It Works", href: "#how-it-works" },
   { label: "Pricing", href: "#pricing" },
   { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#020617]/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#020617]/55 backdrop-blur-2xl">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
         <Link
           href="/"
