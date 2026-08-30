@@ -45,6 +45,29 @@ const chartData = [
   { name: "Sun", value: 92 },
 ];
 
+const liveSignalData = [
+  { name: "T1", value: 38 },
+  { name: "T2", value: 52 },
+  { name: "T3", value: 48 },
+  { name: "T4", value: 66 },
+  { name: "T5", value: 58 },
+  { name: "T6", value: 72 },
+  { name: "T7", value: 64 },
+  { name: "T8", value: 80 },
+  { name: "T9", value: 76 },
+  { name: "T10", value: 88 },
+  { name: "T11", value: 82 },
+  { name: "T12", value: 94 },
+];
+
+const flowSteps = [
+  { label: "Upload", progress: 38, active: true, icon: Database },
+  { label: "Parsing", progress: 56, active: true, icon: Sparkles },
+  { label: "Cleaning", progress: 74, active: true, icon: ShieldCheck },
+  { label: "Validation", progress: 86, active: true, icon: Gauge },
+  { label: "AI Insight", progress: 96, active: true, icon: Bot },
+];
+
 const alerts = [
   { label: "Nulls", value: "2.4%", tone: "text-[#60a5fa]" },
   { label: "Duplicates", value: "0.7%", tone: "text-[#fbbf24]" },
@@ -361,6 +384,182 @@ export default function LandingPage() {
               </div>
             </div>
           </motion.div>
+        </section>
+
+        <section id="live-data-flow" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={fadeUp}
+            transition={{ duration: 0.55 }}
+            className="mx-auto mb-10 max-w-3xl text-center"
+          >
+            <p className="mb-3 text-[12px] uppercase tracking-[0.2em] text-[#7B91FF]">Live Data Flow</p>
+            <h2 className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">Watch raw data become trusted insight in real time.</h2>
+          </motion.div>
+
+          <div className="grid gap-6 lg:grid-cols-[1.22fr_0.78fr]">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6 }}
+              className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.03] p-5 shadow-[0_28px_70px_rgba(10,15,30,0.52)] backdrop-blur-xl"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(123,145,255,0.22),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(94,234,212,0.18),_transparent_30%)]" />
+
+              <div className="relative mb-5 flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#09111d]/80 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <span className="relative flex h-2.5 w-2.5 items-center justify-center">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#5eead4]/90 opacity-80" />
+                    <span className="relative h-2 w-2 rounded-full bg-[#5eead4]" />
+                  </span>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-slate-400">Signal</div>
+                    <div className="text-sm font-medium text-white">Streaming health metric</div>
+                  </div>
+                </div>
+
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#7b91ff]/35 bg-[#7b91ff]/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#dfe7ff]">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#5eead4]" />
+                  Live
+                </div>
+              </div>
+
+              <div className="relative h-[240px] overflow-hidden rounded-[24px] border border-white/10 bg-[#07101b]/90 p-4">
+                <motion.svg
+                  className="absolute inset-x-0 top-0 h-full w-full opacity-80"
+                  viewBox="0 0 600 220"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <motion.path
+                    d="M 0 150 C 60 180, 90 110, 150 130 S 260 140, 320 95 S 420 80, 480 125 S 560 90, 600 110"
+                    stroke="rgba(123,145,255,0.7)"
+                    strokeWidth="2.5"
+                    fill="none"
+                    animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.3, 1, 0.3] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.path
+                    d="M 0 170 C 70 190, 100 140, 155 160 S 260 155, 335 120 S 440 100, 495 135 S 560 140, 600 120"
+                    stroke="rgba(94,234,212,0.55)"
+                    strokeWidth="1.75"
+                    fill="none"
+                    animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.2, 0.8, 0.2] }}
+                    transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                  />
+                </motion.svg>
+
+                <div className="relative z-10 flex h-full flex-col justify-between">
+                  <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                    <span>Readings</span>
+                    <span className="text-[#7ee0d6]">+18.3%</span>
+                  </div>
+
+                  <div className="h-[160px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={liveSignalData} margin={{ top: 8, right: 8, left: -20, bottom: 4 }}>
+                        <defs>
+                          <linearGradient id="liveFill" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stopColor="#7b91ff" stopOpacity={0.45} />
+                            <stop offset="55%" stopColor="#8a6ad9" stopOpacity={0.22} />
+                            <stop offset="100%" stopColor="#7b91ff" stopOpacity={0.02} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid stroke="rgba(148,163,184,0.12)" vertical={false} />
+                        <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: "#94a3b8", fontSize: 10 }} />
+                        <YAxis hide domain={[20, 100]} />
+                        <Tooltip
+                          cursor={{ stroke: "rgba(148,163,184,0.3)", strokeDasharray: "4 4" }}
+                          contentStyle={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12 }}
+                        />
+                        <Area type="monotone" dataKey="value" stroke="#7b91ff" strokeWidth={3} fill="url(#liveFill)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="inline-flex max-w-[220px] items-center overflow-hidden text-sm text-slate-200">
+                      <motion.span
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: "100%", opacity: 1 }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        className="inline-block overflow-hidden whitespace-nowrap"
+                      >
+                        Reading data...
+                      </motion.span>
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
+                        className="ml-1 inline-block h-4 w-0.5 rounded-full bg-[#6ee7d9]"
+                      />
+                    </div>
+                    <div className="rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-300">
+                      Processing
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="rounded-[32px] border border-white/10 bg-[#0b1220]/85 p-5 shadow-[0_28px_70px_rgba(11,18,32,0.72)] backdrop-blur-xl"
+            >
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#7B91FF]">Pipeline</div>
+                  <div className="mt-2 text-xl font-semibold text-white">Data stages</div>
+                </div>
+                <div className="rounded-full border border-[#7b91ff]/20 bg-[#7b91ff]/10 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-[#dfe7ff]">
+                  Syncing
+                </div>
+              </div>
+
+              <div className="relative space-y-4">
+                <div className="absolute left-[18px] top-3 bottom-3 hidden w-px bg-gradient-to-b from-[#7b91ff] via-[#8a6ad9] to-[#5eead4] md:block" />
+                {flowSteps.map((step, index) => {
+                  const Icon = step.icon;
+
+                  return (
+                    <motion.div
+                      key={step.label}
+                      initial={{ opacity: 0, x: 18 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.25 }}
+                      transition={{ duration: 0.45, delay: index * 0.08 }}
+                      className="relative pl-0 md:pl-10"
+                    >
+                      <div className="absolute left-0 top-1.5 hidden h-8 w-8 items-center justify-center rounded-full border border-[#7b91ff]/30 bg-[#0e1830] text-[#dfe7ff] shadow-[0_0_20px_rgba(123,145,255,0.35)] md:flex">
+                        <Icon className="h-4 w-4" />
+                      </div>
+
+                      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
+                        <div className="mb-2 flex items-center justify-between gap-2 text-sm">
+                          <span className="font-medium text-white">{step.label}</span>
+                          <span className="text-[11px] uppercase tracking-[0.18em] text-slate-300">{step.progress}%</span>
+                        </div>
+
+                        <div className="h-2.5 overflow-hidden rounded-full bg-white/5">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${step.progress}%` }}
+                            transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 + index * 0.08 }}
+                            className="h-full rounded-full bg-gradient-to-r from-[#7b91ff] via-[#8a6ad9] to-[#5eead4] shadow-[0_0_18px_rgba(123,145,255,0.5)]"
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </div>
         </section>
 
         <section id="features" className="mx-auto max-w-7xl px-6 py-20 md:px-10">

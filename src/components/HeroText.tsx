@@ -13,19 +13,19 @@ export default function HeroText({ isAuthenticated }: HeroTextProps) {
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#5eead4]/80 opacity-75" />
           <span className="relative h-2 w-2 rounded-full bg-[#5eead4]" />
         </span>
-        Trusted by 2000+ data teams
+        AI data cleaning for teams that move fast
       </div>
 
       <h1 className="text-[2.8rem] font-semibold leading-[0.94] tracking-[-0.065em] text-white md:text-[5rem]">
-        <span className="block">Clean Data.</span>
+        <span className="block">Make every row</span>
         <span className="block bg-gradient-to-r from-[#7b91ff] via-[#8a6ad9] to-[#6ee7d9] bg-[length:200%_100%] bg-clip-text text-transparent">
-          Smarter Decisions.
+          remarkable.
         </span>
       </h1>
 
       <p className="mt-6 max-w-lg text-base leading-8 text-slate-300 md:text-lg">
-        AI-powered data quality for modern teams—detect issues early, standardize messy records,
-        and turn raw files into trusted business decisions in minutes.
+        Detect anomalies, standardize messy records, and turn fragmented datasets into trusted,
+        decision-ready insights with AI-powered data quality workflows built for modern operations.
       </p>
 
       <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -44,7 +44,23 @@ export default function HeroText({ isAuthenticated }: HeroTextProps) {
         </a>
       </div>
 
-      <div className="mt-10 flex flex-wrap items-center gap-6 text-[12px] text-slate-300">
+      <div className="mt-8 flex items-center gap-4">
+        <div className="flex -space-x-2">
+          {['A', 'L', 'S'].map((letter, index) => (
+            <div
+              key={letter}
+              className={`flex h-8 w-8 items-center justify-center rounded-full border border-[#0b1120] text-[10px] font-semibold text-white ${index === 0 ? 'bg-[#7b91ff]' : index === 1 ? 'bg-[#9a6bff]' : 'bg-[#6ee7d9]'}`}
+            >
+              {letter}
+            </div>
+          ))}
+        </div>
+        <div className="text-[12px] text-slate-300">
+          Trusted by <span className="font-semibold text-white">2000+</span> teams
+        </div>
+      </div>
+
+      <div className="mt-8 flex flex-wrap items-center gap-6 text-[12px] text-slate-300">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-[#6ee7d9]" /> 99.9% reliability
         </div>
