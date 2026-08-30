@@ -211,7 +211,7 @@ export default function LandingPage() {
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           >
             <HeroText isAuthenticated={isAuthenticated} />
           </motion.div>
@@ -219,7 +219,7 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
             className="relative"
             style={{ transform: `perspective(1200px) rotateX(${transform.rotateX}) rotateY(${transform.rotateY})` }}
           >
@@ -277,7 +277,7 @@ export default function LandingPage() {
                             key={step.label}
                             whileHover={{ y: -3, scale: 1.02 }}
                             animate={isActive ? { boxShadow: ["0 0 0 rgba(94,234,212,0.12)", "0 10px 22px rgba(94,234,212,0.14)", "0 0 0 rgba(94,234,212,0.12)"] } : {}}
-                            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                            transition={{ duration: 2.8, repeat: Infinity, ease: [0.4, 0, 0.2, 1] }}
                             className={`relative rounded-2xl border p-3 text-center ${isActive ? "border-[#7ee0d6]/50 bg-[#0f1f2d]" : "border-white/10 bg-white/[0.02]"}`}
                           >
                             <div className={`mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl ${index % 2 === 0 ? "bg-gradient-to-br from-[#7b91ff] to-[#6ee7d9]" : "bg-gradient-to-br from-[#9a6bff] to-[#7b91ff]"} text-white`}>
@@ -301,8 +301,8 @@ export default function LandingPage() {
                       <div className="flex items-center gap-4">
                         <div className="relative flex h-28 w-28 items-center justify-center rounded-full border border-white/10 bg-[#111c2d]">
                           <motion.div
-                            animate={{ scale: [1, 1.04, 1] }}
-                            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                            animate={{ scale: [1, 1.03, 1] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: [0.4, 0, 0.2, 1] }}
                             className="absolute inset-2 rounded-full border border-[#7ee0d6]/40"
                           />
                           <div className="text-center">
@@ -326,7 +326,7 @@ export default function LandingPage() {
                                 <motion.div
                                   initial={{ width: 0 }}
                                   animate={{ width: `${metric.value}%` }}
-                                  transition={{ duration: 1, ease: "easeOut" }}
+                                  transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1] }}
                                   className="h-full rounded-full"
                                   style={{ background: metric.color }}
                                 />

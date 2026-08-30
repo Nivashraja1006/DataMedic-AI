@@ -76,7 +76,7 @@ export default function Slideshow({ slides = defaultSlides }: SlideshowProps) {
             initial={{ opacity: 0, x: 30, scale: 0.98 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: -30, scale: 0.98 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
+            transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
             className="space-y-5"
           >
             <p className="text-sm leading-7 text-slate-300">{activeSlide.description}</p>
@@ -91,7 +91,7 @@ export default function Slideshow({ slides = defaultSlides }: SlideshowProps) {
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${item.amount}%` }}
-                    transition={{ duration: 0.9, ease: "easeOut" }}
+                    transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1] }}
                     className="h-full rounded-full"
                     style={{ background: `linear-gradient(90deg, ${activeSlide.accent}, #9a6bff)` }}
                   />

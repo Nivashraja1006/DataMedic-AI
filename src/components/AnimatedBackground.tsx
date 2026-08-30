@@ -55,7 +55,7 @@ export default function AnimatedBackground() {
             }}
             transition={{
               duration: 16 + index * 4,
-              ease: "easeInOut",
+              ease: [0.4, 0, 0.2, 1],
               repeat: Infinity,
             }}
           />
@@ -73,7 +73,7 @@ export default function AnimatedBackground() {
           }}
           transition={{
             duration: blob.duration,
-            ease: "easeInOut",
+            ease: [0.4, 0, 0.2, 1],
             repeat: Infinity,
             repeatType: "mirror",
           }}
@@ -86,7 +86,7 @@ export default function AnimatedBackground() {
           scaleX: [1, 1.18, 1],
           opacity: [0.2, 0.35, 0.2],
         }}
-        transition={{ duration: 15, ease: "easeInOut", repeat: Infinity }}
+        transition={{ duration: 15, ease: [0.4, 0, 0.2, 1], repeat: Infinity }}
       />
 
       {particles.map((particle) => (
@@ -108,7 +108,7 @@ export default function AnimatedBackground() {
           transition={{
             duration: particle.duration,
             delay: particle.delay,
-            ease: "easeInOut",
+            ease: [0.4, 0, 0.2, 1],
             repeat: Infinity,
           }}
         />

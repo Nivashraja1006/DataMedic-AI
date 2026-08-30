@@ -34,7 +34,7 @@ export default function DashboardPreview() {
       className="relative mx-auto w-full max-w-[560px]"
       initial={{ opacity: 0, y: 28, rotateX: 10 }}
       animate={{ opacity: 1, y: [0, -8, 0], rotateX: 0 }}
-      transition={{ duration: 6, ease: "easeInOut", repeat: Infinity, repeatType: "mirror" }}
+      transition={{ duration: 6, ease: [0.4, 0, 0.2, 1], repeat: Infinity, repeatType: "mirror" }}
       whileHover={{ y: -8, rotateX: 3, rotateY: -4 }}
       style={{ transformStyle: "preserve-3d" }}
     >
@@ -68,7 +68,7 @@ export default function DashboardPreview() {
               <div className="relative flex justify-center">
                 <motion.div
                   animate={{ scale: [1, 1.04, 1], boxShadow: ["0 0 0 rgba(123,145,255,0.1)", "0 0 18px rgba(123,145,255,0.18)", "0 0 0 rgba(123,145,255,0.1)"] }}
-                  transition={{ duration: 3.8, ease: "easeInOut", repeat: Infinity }}
+                  transition={{ duration: 3.8, ease: [0.4, 0, 0.2, 1], repeat: Infinity }}
                   className="relative flex h-36 w-36 items-center justify-center rounded-full border border-white/10 bg-[#0f172a]"
                 >
                   <div className="absolute inset-4 rounded-full border border-[#8aa8ff]/30" />
@@ -93,7 +93,7 @@ export default function DashboardPreview() {
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${metric.value}%` }}
-                        transition={{ duration: 1.1, ease: "easeOut" }}
+                        transition={{ duration: 1.1, ease: [0.4, 0, 0.2, 1] }}
                         className="h-full rounded-full"
                         style={{ background: metric.color }}
                       />
