@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import InsightCarousel from "@/components/InsightCarousel";
 import { motion } from "framer-motion";
+import Papa from "papaparse";
+import * as XLSX from "xlsx";
 import { useEffect, useMemo, useState } from "react";
 import { datasetService } from "@/services/api";
 import {
@@ -27,10 +30,212 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
+type PreviewMetrics = {
+  rows: number;
+  columns: number;
+  nullPercent: number;
+  duplicatePercent: number;
+  completeness: number;
+  uniqueness: number;
+  validity: number;
+  score: number;
+  outlierPercent: number;
+  alerts: string[];
+  previewRows: Record<string, any>[];
+  parsedSuccessfully: boolean;
+};
+
 function getScoreColor(value: number) {
   if (value >= 80) return "#34D399";
   if (value >= 60) return "#F2B84B";
   return "#FF6B75";
+}
+
+function normalizeRecordRow(row: Record<string, any>) {
+  const normalized: Record<string, any> = {};
+  Object.entries(row).forEach(([key, value]) => {
+    const cleanKey = String(key || "").trim() || `column_${Math.random().toString(36).slice(2, 8)}`;
+    normalized[cleanKey] = value === null || value === undefined ? "" : String(value).trim() === "" ? "" : value;
+  });
+  return normalized;
+}
+
+function normalizeParsedRows(rows: Record<string, any>[]): Record<string, any>[] {
+  return rows
+    .map((row) => normalizeRecordRow(row || {}))
+    .filter((row) => Object.keys(row).length > 0 && Object.values(row).some((value) => value !== null && value !== undefined && String(value).trim() !== ""));
+}
+
+function safeNumeric(value: any, fallback = 0) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : fallback;
+}
+
+function computeDatasetPreviewMetrics(file: File): Promise<PreviewMetrics> {
+  return new Promise((resolve) => {
+    const fileName = file.name.toLowerCase();
+
+    const finalizeInvalid = (message: string): void => {
+      resolve({
+        rows: 0,
+        columns: 0,
+        nullPercent: 0,
+        duplicatePercent: 0,
+        completeness: 100,
+        uniqueness: 100,
+        validity: 100,
+        score: 100,
+        outlierPercent: 0,
+        alerts: [message],
+        previewRows: [],
+        parsedSuccessfully: false,
+      });
+    };
+
+    try {
+      if (fileName.endsWith(".csv")) {
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: (header) => header.trim() || "column",
+          complete: (result) => {
+            console.log("CSV parsed output:", result);
+            const records = normalizeParsedRows((result.data as Record<string, any>[]) || []);
+            if (!records.length) {
+              finalizeInvalid("Invalid or empty dataset");
+              return;
+            }
+
+            const columns = Object.keys(records[0] || {}).length || 0;
+            const rows = records.length;
+            const totalCells = Math.max(rows * columns, 1);
+            let nullCount = 0;
+            records.forEach((row) => {
+              Object.values(row).forEach((value) => {
+                if (value === null || value === undefined || String(value).trim() === "") nullCount += 1;
+              });
+            });
+
+            const uniqueRows = new Set(records.map((row) => JSON.stringify(Object.values(row).map((value) => String(value).trim()))));
+            const duplicateCount = Math.max(rows - uniqueRows.size, 0);
+            const nullPercent = (nullCount / totalCells) * 100;
+            const duplicatePercent = rows > 0 ? (duplicateCount / rows) * 100 : 0;
+            const completeness = 100 - nullPercent;
+            const uniqueness = 100 - duplicatePercent;
+            const validity = 100;
+            const score = (completeness + uniqueness + validity) / 3;
+
+            const previewRows = records.slice(0, 5);
+            console.log("Parsed rows preview:", previewRows);
+            resolve({
+              rows,
+              columns,
+              nullPercent: Number.isFinite(nullPercent) ? nullPercent : 0,
+              duplicatePercent: Number.isFinite(duplicatePercent) ? duplicatePercent : 0,
+              completeness: Number.isFinite(completeness) ? completeness : 100,
+              uniqueness: Number.isFinite(uniqueness) ? uniqueness : 100,
+              validity: Number.isFinite(validity) ? validity : 100,
+              score: Number.isFinite(score) ? score : 100,
+              outlierPercent: 0,
+              alerts: ["File parsed successfully"],
+              previewRows,
+              parsedSuccessfully: true,
+            });
+          },
+          error: (error) => {
+            console.error("CSV parsing error:", error);
+            finalizeInvalid("Invalid or empty dataset");
+          },
+        });
+        return;
+      }
+
+      if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls") || fileName.endsWith(".json")) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            let records: Record<string, any>[] = [];
+            const rawText = String(reader.result || "");
+
+            if (fileName.endsWith(".json")) {
+              const parsed = JSON.parse(rawText || "[]");
+              records = Array.isArray(parsed)
+                ? parsed
+                : Array.isArray(parsed?.data)
+                  ? parsed.data
+                  : Array.isArray(parsed?.rows)
+                    ? parsed.rows
+                    : [];
+            } else {
+              const workbook = XLSX.read(reader.result as ArrayBuffer, { type: "array", cellDates: true });
+              const sheetName = workbook.SheetNames[0];
+              const sheet = workbook.Sheets[sheetName];
+              records = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: false, blankrows: false }) as Record<string, any>[];
+            }
+
+            console.log("Excel/JSON parsed output:", records);
+            const cleaned = normalizeParsedRows(records);
+            if (!cleaned.length) {
+              finalizeInvalid("Invalid or empty dataset");
+              return;
+            }
+
+            const rows = cleaned.length;
+            const columns = Object.keys(cleaned[0] || {}).length || 0;
+            const totalCells = Math.max(rows * columns, 1);
+            let nullCount = 0;
+            cleaned.forEach((row) => {
+              Object.values(row).forEach((value) => {
+                if (value === null || value === undefined || String(value).trim() === "") nullCount += 1;
+              });
+            });
+
+            const uniqueRows = new Set(cleaned.map((row) => JSON.stringify(Object.values(row).map((value) => String(value).trim()))));
+            const duplicateCount = Math.max(rows - uniqueRows.size, 0);
+            const nullPercent = (nullCount / totalCells) * 100;
+            const duplicatePercent = rows > 0 ? (duplicateCount / rows) * 100 : 0;
+            const completeness = 100 - nullPercent;
+            const uniqueness = 100 - duplicatePercent;
+            const validity = 100;
+            const score = (completeness + uniqueness + validity) / 3;
+
+            const previewRows = cleaned.slice(0, 5);
+            console.log("Parsed rows preview:", previewRows);
+            resolve({
+              rows,
+              columns,
+              nullPercent: Number.isFinite(nullPercent) ? nullPercent : 0,
+              duplicatePercent: Number.isFinite(duplicatePercent) ? duplicatePercent : 0,
+              completeness: Number.isFinite(completeness) ? completeness : 100,
+              uniqueness: Number.isFinite(uniqueness) ? uniqueness : 100,
+              validity: Number.isFinite(validity) ? validity : 100,
+              score: Number.isFinite(score) ? score : 100,
+              outlierPercent: 0,
+              alerts: ["File parsed successfully"],
+              previewRows,
+              parsedSuccessfully: true,
+            });
+          } catch (error) {
+            console.error("Excel/JSON parsing error:", error);
+            finalizeInvalid("Invalid or empty dataset");
+          }
+        };
+
+        if (fileName.endsWith(".json")) {
+          reader.readAsText(file);
+          return;
+        }
+
+        reader.readAsArrayBuffer(file);
+        return;
+      }
+
+      finalizeInvalid("Invalid or empty dataset");
+    } catch (error) {
+      console.error("File parse failed:", error);
+      finalizeInvalid("Invalid or empty dataset");
+    }
+  });
 }
 
 function ScoreRing({ value, label }: { value: number; label: string }) {
@@ -75,6 +280,8 @@ export default function DashboardPage() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadName, setUploadName] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [previewMetrics, setPreviewMetrics] = useState<PreviewMetrics | null>(null);
+  const [isCalculatingPreview, setIsCalculatingPreview] = useState(false);
   const [processingStage, setProcessingStage] = useState<"idle" | "uploading" | "analyzing" | "completed">("idle");
 
   useEffect(() => {
@@ -88,6 +295,33 @@ export default function DashboardPage() {
       loadDatasets();
     }
   }, [token]);
+
+  useEffect(() => {
+    if (!uploadFile) {
+      setPreviewMetrics(null);
+      setIsCalculatingPreview(false);
+      return;
+    }
+
+    let active = true;
+    setIsCalculatingPreview(true);
+
+    computeDatasetPreviewMetrics(uploadFile)
+      .then((metrics) => {
+        if (active) {
+          setPreviewMetrics(metrics);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setIsCalculatingPreview(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [uploadFile]);
 
   const summary = useMemo(() => {
     const totalDatasets = datasets.length;
@@ -187,11 +421,13 @@ export default function DashboardPage() {
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
         .display { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.02em; }
         .glass-panel { backdrop-filter: blur(14px); background: rgba(9, 12, 18, 0.7); }
-        .glass-card { background: rgba(15, 19, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
-        .glow-btn { transition: transform .2s ease, box-shadow .3s ease; }
-        .glow-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 36px -10px rgba(108,124,251,0.6); }
-        .card-hover { transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
-        .card-hover:hover { transform: translateY(-3px); border-color: rgba(156,170,255,0.4); box-shadow: 0 18px 38px -20px rgba(108,124,251,0.7); }
+        .glass-card { background: rgba(15, 19, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 0 0 1px rgba(107,114,255,0.04); }
+        .glow-btn { transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
+        .glow-btn:hover { transform: translateY(-1px) scale(1.01); box-shadow: 0 0 0 1px rgba(108,124,251,0.2), 0 18px 45px -18px rgba(108,124,251,0.85); }
+        .card-hover { transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease; }
+        .card-hover:hover { transform: translateY(-3px); border-color: rgba(156,170,255,0.38); box-shadow: 0 18px 38px -20px rgba(108,124,251,0.8), 0 0 0 1px rgba(59,130,246,0.12); }
+        .upload-hover { transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
+        .upload-hover:hover { transform: scale(1.03); border-color: rgba(108,124,251,0.5); box-shadow: 0 0 0 1px rgba(108,124,251,0.18), 0 18px 40px -18px rgba(108,124,251,0.9), 0 0 28px rgba(59,130,246,0.18); }
         .animated-bg { position: absolute; inset: 0; background:
           radial-gradient(circle at 20% 20%, rgba(108,124,251,0.18), transparent 22%),
           radial-gradient(circle at 80% 10%, rgba(47,217,196,0.12), transparent 18%),
@@ -208,14 +444,15 @@ export default function DashboardPage() {
 
       <header className="relative z-10 border-b border-white/8 px-6 py-4 glass-panel">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="group flex items-center gap-3 transition duration-200 hover:opacity-90 hover:scale-[1.02]">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#6C7CFB] to-[#2FD9C4] flex items-center justify-center shadow-[0_10px_26px_rgba(108,124,251,0.45)] transition duration-200 group-hover:scale-105">
-              <Sparkles size={20} />
-            </div>
-            <div>
-              <h1 className="display text-[20px] font-semibold">DataMedic <span className="text-[#838DA3]">AI</span></h1>
-              <p className="text-[11px] text-[#666f82]">Real-time data quality intelligence</p>
-            </div>
+          <Link href="/" className="group flex items-center gap-2 transition duration-200 hover:opacity-100 hover:scale-[1.02]" aria-label="Go to DataMedic AI home">
+            <Image
+              src="/logo-main.svg"
+              alt="DataMedic AI logo"
+              width={220}
+              height={52}
+              priority
+              className="h-[42px] w-auto object-contain transition-all duration-200 group-hover:scale-105 group-hover:drop-shadow-[0_0_14px_rgba(59,130,246,0.5)] md:h-[46px]"
+            />
           </Link>
 
           <div className="flex items-center gap-4">
@@ -256,11 +493,12 @@ export default function DashboardPage() {
             { label: "Total Datasets", value: summary.totalDatasets, icon: Database, tone: "#6C7CFB" },
             { label: "Avg. Quality", value: `${summary.averageScore.toFixed(0)}/100`, icon: BarChart3, tone: "#9A6BFF" },
             { label: "Rows Scanned", value: summary.totalRows.toLocaleString(), icon: TrendingUp, tone: "#2FD9C4" },
-          ].map((metric) => (
+          ].map((metric, index) => (
             <motion.div
               key={metric.label}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.42, delay: index * 0.08, ease: "easeOut" }}
               className="glass-card rounded-2xl p-4"
             >
               <div className="flex items-center justify-between mb-4">
@@ -363,8 +601,10 @@ export default function DashboardPage() {
             <motion.button
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
               onClick={() => setShowUpload(true)}
-              className="glow-btn w-full rounded-2xl border border-dashed border-[#6C7CFB]/40 bg-gradient-to-r from-[#6C7CFB]/10 to-[#9A6BFF]/10 p-8 text-center"
+              className="upload-hover glow-btn w-full rounded-2xl border border-dashed border-[#6C7CFB]/40 bg-gradient-to-r from-[#6C7CFB]/10 to-[#9A6BFF]/10 p-8 text-center"
             >
               <div className="flex flex-col items-center justify-center gap-3">
                 <div className="rounded-full bg-[#6C7CFB]/12 p-3 text-[#9A6BFF]">
@@ -403,6 +643,133 @@ export default function DashboardPage() {
                   />
                   {uploadFile && <p className="mt-2 text-[12px] text-[#34D399]">✓ {uploadFile.name} selected</p>}
                 </div>
+
+                {uploadFile && (
+                  <div className="rounded-2xl border border-white/10 bg-[#0A1220]/90 p-4">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">Live dataset preview</p>
+                        <h4 className="display text-[18px] font-semibold text-white">{uploadName || uploadFile.name}</h4>
+                      </div>
+                      {isCalculatingPreview ? (
+                        <div className="flex items-center gap-2 rounded-full border border-[#6C7CFB]/30 bg-[#6C7CFB]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-[#A9B9FF]">
+                          <span className="h-2 w-2 animate-pulse rounded-full bg-[#6C7CFB]" />
+                          Analyzing
+                        </div>
+                      ) : previewMetrics ? (
+                        <div className="rounded-full border border-[#34D399]/30 bg-[#34D399]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-[#7AE8BA]">
+                          {previewMetrics.score.toFixed(0)}/100
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {previewMetrics ? (
+                      <div className="space-y-4">
+                        {previewMetrics.rows === 0 && previewMetrics.columns === 0 ? (
+                          <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-3 text-[12px] text-red-200">
+                            Invalid or empty dataset
+                          </div>
+                        ) : (
+                          <>
+                            <div className="grid grid-cols-2 gap-3 text-[11px] text-slate-300 sm:grid-cols-4">
+                              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5">
+                                <div className="text-slate-400">Rows</div>
+                                <div className="display mt-1 text-[18px] text-white">{previewMetrics.rows}</div>
+                              </div>
+                              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5">
+                                <div className="text-slate-400">Cols</div>
+                                <div className="display mt-1 text-[18px] text-white">{previewMetrics.columns}</div>
+                              </div>
+                              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5">
+                                <div className="text-slate-400">Null %</div>
+                                <div className="display mt-1 text-[18px] text-white">{previewMetrics.nullPercent.toFixed(1)}%</div>
+                              </div>
+                              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5">
+                                <div className="text-slate-400">Dup %</div>
+                                <div className="display mt-1 text-[18px] text-white">{previewMetrics.duplicatePercent.toFixed(1)}%</div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-3">
+                              {[
+                                { label: "Completeness", value: previewMetrics.completeness, color: "#60a5fa" },
+                                { label: "Uniqueness", value: previewMetrics.uniqueness, color: "#34D399" },
+                                { label: "Validity", value: previewMetrics.validity, color: "#9A6BFF" },
+                              ].map((metric) => (
+                                <div key={metric.label}>
+                                  <div className="mb-1 flex items-center justify-between text-[11px] text-slate-300">
+                                    <span>{metric.label}</span>
+                                    <span>{metric.value.toFixed(1)}%</span>
+                                  </div>
+                                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/6">
+                                    <motion.div
+                                      initial={{ width: 0 }}
+                                      animate={{ width: `${Math.min(metric.value, 100)}%` }}
+                                      transition={{ duration: 0.8, ease: "easeOut" }}
+                                      className="h-full rounded-full"
+                                      style={{ background: metric.color }}
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                              <div>
+                                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-400">Quality score</div>
+                                <div className="display text-[20px] text-white">{previewMetrics.score.toFixed(0)}/100</div>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {previewMetrics.alerts.map((alert) => (
+                                  <span key={alert} className="rounded-full border border-white/10 bg-[#0D1424] px-2 py-1 text-[10px] text-slate-200">
+                                    {alert}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            {previewMetrics.previewRows.length > 0 && (
+                              <div className="rounded-xl border border-white/10 bg-[#0B1120] p-3">
+                                <div className="mb-2 flex items-center justify-between">
+                                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-400">Preview</div>
+                                  <div className="text-[10px] uppercase tracking-[0.14em] text-[#34D399]">File parsed successfully</div>
+                                </div>
+                                <div className="overflow-x-auto">
+                                  <table className="min-w-full text-left text-[11px] text-slate-200">
+                                    <thead>
+                                      <tr>
+                                        {Object.keys(previewMetrics.previewRows[0]).map((header) => (
+                                          <th key={header} className="border-b border-white/10 px-2 py-1.5 font-medium text-slate-300">
+                                            {header}
+                                          </th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {previewMetrics.previewRows.map((row, index) => (
+                                        <tr key={`${index}-${Object.values(row).join("-")}`}>
+                                          {Object.values(row).map((value, valueIndex) => (
+                                            <td key={`${index}-${valueIndex}`} className="border-b border-white/5 px-2 py-1.5 text-slate-300">
+                                              {String(value ?? "")}
+                                            </td>
+                                          ))}
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-3 text-[12px] text-slate-400">
+                        Preparing preview metrics...
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {error && (
                   <div className="rounded-xl border border-[#FF6B75]/25 bg-[#FF6B75]/10 p-3 text-[12px] text-[#FF6B75]">
@@ -463,9 +830,9 @@ export default function DashboardPage() {
                 return (
                   <motion.div
                     key={dataset.id}
-                    initial={{ opacity: 0, y: 16 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.04 }}
+                    transition={{ duration: 0.45, delay: index * 0.07, ease: "easeOut" }}
                     onClick={() => router.push(`/dashboard/dataset/${dataset.id}`)}
                     className="card-hover cursor-pointer rounded-3xl border border-white/10 glass-card p-5"
                   >

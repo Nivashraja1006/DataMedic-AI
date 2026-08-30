@@ -41,6 +41,39 @@ EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 PHONE_PATTERN = re.compile(r"^[+\d][\d\s().-]{7,}$")
 
 
+def safe_float(value, default=0.0):
+    """Return a finite float or a safe default."""
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return float(default)
+
+    if pd.isna(numeric) or not np.isfinite(numeric):
+        return float(default)
+    return float(numeric)
+
+
+def safe_divide(numerator, denominator, default=0.0):
+    """Prevent division by zero and NaN propagation."""
+    numerator = safe_float(numerator, 0.0)
+    denominator = safe_float(denominator, 0.0)
+    if denominator == 0:
+        return float(default)
+    result = numerator / denominator
+    return safe_float(result, default)
+
+
+def validate_dataset(frame):
+    """Ensure we only process a valid DataFrame with usable structure."""
+    if frame is None or not isinstance(frame, pd.DataFrame):
+        raise ValueError("Dataset is missing or invalid")
+    if frame.empty:
+        raise ValueError("Dataset is empty")
+    if len(frame.columns) == 0:
+        raise ValueError("Dataset has no columns")
+    return frame
+
+
 def read_dataset(upload):
     suffix = Path(upload.filename or "").suffix.lower()
     payload = upload.read()
@@ -54,55 +87,113 @@ def read_dataset(upload):
 
 
 def profile_dataset(frame):
-    """Generate comprehensive data profile"""
+    """Generate comprehensive data profile."""
+    try:
+        validate_dataset(frame)
+    except ValueError:
+        return {
+            "rows": 0,
+            "columns": 0,
+            "quality_score": 0.0,
+            "missing_values": 0,
+            "duplicate_rows": 0,
+            "outliers": 0,
+            "columns_profile": [],
+            "preview": [],
+        }
+
     numeric = frame.select_dtypes(include=np.number)
     outlier_count = 0
     if not numeric.empty and len(frame) > 8:
-        model = IsolationForest(random_state=42, contamination="auto")
-        outlier_count = int((model.fit_predict(numeric.fillna(numeric.median())) == -1).sum())
+        try:
+            model = IsolationForest(random_state=42, contamination="auto")
+            outlier_count = int((model.fit_predict(numeric.fillna(numeric.median())) == -1).sum())
+        except Exception:
+            outlier_count = 0
 
     missing = int(frame.isna().sum().sum())
     duplicate = int(frame.duplicated().sum())
-    total_cells = max(frame.size, 1)
-    quality = round(max(0, 100 - ((missing / total_cells) * 45) - ((duplicate / max(len(frame), 1)) * 30) - ((outlier_count / max(len(frame), 1)) * 15)), 1)
-    
+    total_cells = max(int(frame.size), 1)
+    row_count = max(int(len(frame)), 1)
+
+    quality = round(
+        max(
+            0.0,
+            100
+            - ((safe_divide(float(missing), float(total_cells), 0.0)) * 45)
+            - ((safe_divide(float(duplicate), float(row_count), 0.0)) * 30)
+            - ((safe_divide(float(outlier_count), float(row_count), 0.0)) * 15),
+        ),
+        1,
+    )
+
     columns = []
     for name in frame.columns:
         series = frame[name]
-        # Detect column type
-        col_type = "numeric" if pd.api.types.is_numeric_dtype(series) else "datetime" if pd.api.types.is_datetime64_any_dtype(series) else "category" if series.nunique() / max(len(series), 1) < 0.05 else "string"
-        
+        series_length = max(int(len(series)), 1)
+        col_type = (
+            "numeric"
+            if pd.api.types.is_numeric_dtype(series)
+            else "datetime"
+            if pd.api.types.is_datetime64_any_dtype(series)
+            else "category"
+            if safe_divide(float(series.nunique(dropna=True)), float(series_length), 0.0) < 0.05
+            else "string"
+        )
+
+        null_percent = safe_divide(float(series.isna().sum()), float(series_length), 0.0) * 100
+        unique_percent = safe_divide(float(series.nunique(dropna=True)), float(series_length), 0.0) * 100
+
         columns.append({
             "name": str(name),
             "type": col_type,
-            "null_percent": round(float(series.isna().mean() * 100), 2),
-            "unique_percent": round(float(series.nunique(dropna=True) / max(len(series), 1) * 100), 2),
+            "null_percent": round(float(null_percent), 2),
+            "unique_percent": round(float(unique_percent), 2),
             "missing_count": int(series.isna().sum()),
             "unique_count": int(series.nunique(dropna=True)),
             "sample": str(series.dropna().iloc[0]) if not series.dropna().empty else None,
         })
 
+    preview_data = frame.head(10).replace({np.nan: None, np.inf: None, -np.inf: None})
     return {
         "rows": int(len(frame)),
         "columns": int(len(frame.columns)),
-        "quality_score": quality,
+        "quality_score": float(safe_float(quality, 0.0)),
         "missing_values": missing,
         "duplicate_rows": duplicate,
         "outliers": outlier_count,
         "columns_profile": columns,
-        "preview": frame.head(10).replace({np.nan: None}).to_dict(orient="records"),
+        "preview": preview_data.to_dict(orient="records"),
     }
 
 
 def summarize_dataset_analysis(frame):
     """Compute a summary used by the live dashboard and real-time quality widgets."""
+    try:
+        validate_dataset(frame)
+    except ValueError:
+        return {
+            "overall_score": 0.0,
+            "null_percent": 0.0,
+            "duplicate_percent": 0.0,
+            "validity_score": 0.0,
+            "outlier_percent": 0.0,
+            "missing_values": 0,
+            "duplicate_rows": 0,
+            "outliers": 0,
+            "issues": [],
+            "profile": profile_dataset(frame),
+            "insights": ["The dataset is empty or invalid and requires a valid file to run analysis."],
+            "status": "needs-review",
+        }
+
     profile = profile_dataset(frame)
     issues = detect_all_issues(frame)
 
     total_rows = max(len(frame), 1)
-    total_cells = max(frame.size, 1)
-    null_percent = round(float(frame.isna().sum().sum() / total_cells * 100), 2)
-    duplicate_percent = round(float(frame.duplicated().sum() / total_rows * 100), 2)
+    total_cells = max(int(frame.size), 1)
+    null_percent = round(float(safe_divide(float(frame.isna().sum().sum()), float(total_cells), 0.0) * 100), 2)
+    duplicate_percent = round(float(safe_divide(float(frame.duplicated().sum()), float(total_rows), 0.0) * 100), 2)
 
     invalid_issue_count = sum(1 for issue in issues if issue["category"] in {"format", "missing"})
     validity_score = max(0.0, 100 - (invalid_issue_count / max(len(issues) or 1, 1) * 100))
@@ -111,8 +202,8 @@ def summarize_dataset_analysis(frame):
     else:
         validity_score = 100.0
 
-    outlier_percent = round(float(profile["outliers"] / total_rows * 100), 2)
-    overall_score = float(profile["quality_score"])
+    outlier_percent = round(float(safe_divide(float(profile["outliers"]), float(total_rows), 0.0) * 100), 2)
+    overall_score = float(safe_float(profile["quality_score"], 0.0))
 
     insights = []
     if null_percent > 10:
@@ -128,10 +219,10 @@ def summarize_dataset_analysis(frame):
 
     return {
         "overall_score": round(overall_score, 1),
-        "null_percent": null_percent,
-        "duplicate_percent": duplicate_percent,
-        "validity_score": round(validity_score, 1),
-        "outlier_percent": outlier_percent,
+        "null_percent": float(safe_float(null_percent, 0.0)),
+        "duplicate_percent": float(safe_float(duplicate_percent, 0.0)),
+        "validity_score": round(float(safe_float(validity_score, 0.0)), 1),
+        "outlier_percent": float(safe_float(outlier_percent, 0.0)),
         "missing_values": int(profile["missing_values"]),
         "duplicate_rows": int(profile["duplicate_rows"]),
         "outliers": int(profile["outliers"]),
