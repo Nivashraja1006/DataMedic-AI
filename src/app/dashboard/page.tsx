@@ -245,25 +245,41 @@ function ScoreRing({ value, label }: { value: number; label: string }) {
   const dashOffset = circumference - (safeValue / 100) * circumference;
 
   return (
-    <div className="relative flex items-center justify-center">
-      <svg className="h-36 w-36 -rotate-90" viewBox="0 0 160 160" aria-label={label}>
+    <div className="score-shell relative flex items-center justify-center">
+      <div className="score-glow" />
+      <svg className="h-40 w-40 -rotate-90" viewBox="0 0 160 160" aria-label={label}>
+        <defs>
+          <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#6C7CFB" />
+            <stop offset="50%" stopColor="#9A6BFF" />
+            <stop offset="100%" stopColor="#2FD9C4" />
+          </linearGradient>
+        </defs>
         <circle cx="80" cy="80" r={radius} stroke="rgba(255,255,255,0.08)" strokeWidth="12" fill="none" />
         <motion.circle
           cx="80"
           cy="80"
           r={radius}
-          stroke={getScoreColor(safeValue)}
+          stroke="url(#scoreGradient)"
           strokeWidth="12"
           fill="none"
           strokeLinecap="round"
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: dashOffset }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
+          transition={{ duration: 1.4, ease: "easeOut" }}
+          className="drop-shadow-[0_0_18px_rgba(108,124,251,0.8)]"
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="display text-4xl font-semibold text-white">{safeValue.toFixed(0)}</span>
+        <motion.span
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
+          className="display text-4xl font-semibold text-white"
+        >
+          {safeValue.toFixed(0)}
+        </motion.span>
         <span className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Score</span>
       </div>
     </div>
@@ -283,6 +299,20 @@ export default function DashboardPage() {
   const [previewMetrics, setPreviewMetrics] = useState<PreviewMetrics | null>(null);
   const [isCalculatingPreview, setIsCalculatingPreview] = useState(false);
   const [processingStage, setProcessingStage] = useState<"idle" | "uploading" | "analyzing" | "completed">("idle");
+  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  const particles = useMemo(
+    () => [
+      { left: "10%", top: "18%", size: 4, delay: 0 },
+      { left: "22%", top: "68%", size: 3, delay: 1.5 },
+      { left: "36%", top: "25%", size: 5, delay: 2.5 },
+      { left: "54%", top: "14%", size: 4, delay: 0.8 },
+      { left: "68%", top: "44%", size: 6, delay: 3 },
+      { left: "82%", top: "28%", size: 4, delay: 1.2 },
+      { left: "90%", top: "62%", size: 3, delay: 2.2 },
+      { left: "12%", top: "80%", size: 5, delay: 0.5 },
+    ],
+    [],
+  );
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -416,31 +446,154 @@ export default function DashboardPage() {
   const latestScore = Number(latestDataset?.analysis?.overall_score ?? latestDataset?.quality_score ?? 0) || 0;
 
   return (
-    <div className="min-h-screen bg-[#05070C] text-[#EDF0F8] overflow-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div
+      className="relative min-h-screen overflow-hidden bg-[#05070C] text-[#EDF0F8]"
+      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+      onMouseMove={(event) => {
+        const bounds = event.currentTarget.getBoundingClientRect();
+        setPointer({ x: event.clientX - bounds.left, y: event.clientY - bounds.top });
+      }}
+    >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
         .display { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.02em; }
-        .glass-panel { backdrop-filter: blur(14px); background: rgba(9, 12, 18, 0.7); }
-        .glass-card { background: rgba(15, 19, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 0 0 1px rgba(107,114,255,0.04); }
+        .glass-panel { backdrop-filter: blur(16px); background: rgba(9, 12, 18, 0.72); border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+        .glass-card {
+          background: linear-gradient(180deg, rgba(15,19,29,0.82), rgba(9,12,18,0.7));
+          border: 1px solid rgba(255,255,255,0.08);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 18px 40px -24px rgba(99,102,241,0.82);
+        }
+        .premium-card {
+          position: relative;
+          overflow: hidden;
+        }
+        .premium-card::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          padding: 1px;
+          background: linear-gradient(135deg, rgba(108,124,251,0.8), rgba(47,217,196,0.5), rgba(154,107,255,0.8));
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: 0.9;
+          pointer-events: none;
+        }
         .glow-btn { transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
         .glow-btn:hover { transform: translateY(-1px) scale(1.01); box-shadow: 0 0 0 1px rgba(108,124,251,0.2), 0 18px 45px -18px rgba(108,124,251,0.85); }
         .card-hover { transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease; }
         .card-hover:hover { transform: translateY(-3px); border-color: rgba(156,170,255,0.38); box-shadow: 0 18px 38px -20px rgba(108,124,251,0.8), 0 0 0 1px rgba(59,130,246,0.12); }
         .upload-hover { transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
         .upload-hover:hover { transform: scale(1.03); border-color: rgba(108,124,251,0.5); box-shadow: 0 0 0 1px rgba(108,124,251,0.18), 0 18px 40px -18px rgba(108,124,251,0.9), 0 0 28px rgba(59,130,246,0.18); }
-        .animated-bg { position: absolute; inset: 0; background:
-          radial-gradient(circle at 20% 20%, rgba(108,124,251,0.18), transparent 22%),
-          radial-gradient(circle at 80% 10%, rgba(47,217,196,0.12), transparent 18%),
-          radial-gradient(circle at 50% 80%, rgba(154,107,255,0.15), transparent 25%);
+        .mesh-bg {
+          position: absolute;
+          inset: 0;
+          background:
+            radial-gradient(circle at 20% 20%, rgba(108,124,251,0.26), transparent 18%),
+            radial-gradient(circle at 80% 12%, rgba(140,92,255,0.22), transparent 20%),
+            radial-gradient(circle at 60% 80%, rgba(47,217,196,0.18), transparent 20%),
+            linear-gradient(120deg, rgba(10,13,20,0.95), rgba(5,7,12,0.96));
           animation: drift 16s ease-in-out infinite alternate;
+        }
+        .mesh-bg::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(rgba(255,255,255,0.03), transparent 28%, rgba(255,255,255,0.02));
+        }
+        .grid-overlay {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(rgba(130, 146, 255, 0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(130, 146, 255, 0.08) 1px, transparent 1px);
+          background-size: 32px 32px;
+          mask-image: radial-gradient(circle at center, black 55%, transparent 100%);
+          opacity: 0.7;
+        }
+        .spotlight {
+          position: absolute;
+          left: var(--mx, 50%);
+          top: var(--my, 50%);
+          width: 38rem;
+          height: 38rem;
+          transform: translate(-50%, -50%);
+          background: radial-gradient(circle, rgba(107,122,255,0.18), rgba(115,92,255,0.08), transparent 64%);
+          filter: blur(30px);
+          pointer-events: none;
+        }
+        .particle {
+          position: absolute;
+          border-radius: 9999px;
+          background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(127,138,255,0.25), transparent 72%);
+          box-shadow: 0 0 18px rgba(127,138,255,0.5);
+          animation: floatParticle 14s ease-in-out infinite;
+        }
+        .score-shell {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .score-glow {
+          position: absolute;
+          inset: 12%;
+          border-radius: 9999px;
+          background: radial-gradient(circle, rgba(108,124,251,0.32), rgba(154,107,255,0.18), transparent 70%);
+          filter: blur(24px);
+          animation: pulseGlow 2.8s ease-in-out infinite;
+        }
+        .progress-shine {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          transform: translateX(-100%);
+          animation: shimmer 2.5s infinite;
+        }
+        .alert-card { animation: slideInUp 0.5s ease-out; }
+        .status-dot {
+          box-shadow: 0 0 18px rgba(52,211,153,0.8);
         }
         @keyframes drift {
           0% { transform: scale(1) translate3d(0,0,0); }
           100% { transform: scale(1.12) translate3d(24px,-18px,0); }
         }
+        @keyframes pulseGlow {
+          0%, 100% { opacity: 0.75; transform: scale(0.94); }
+          50% { opacity: 1; transform: scale(1.06); }
+        }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(120%); }
+        }
+        @keyframes floatParticle {
+          0%, 100% { transform: translateY(0px) scale(1); opacity: 0.25; }
+          50% { transform: translateY(-18px) scale(1.3); opacity: 0.9; }
+        }
+        @keyframes slideInUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
       `}</style>
 
-      <div className="animated-bg" aria-hidden="true" />
+      <div className="mesh-bg" aria-hidden="true" />
+      <div className="grid-overlay" aria-hidden="true" />
+      <div className="spotlight" aria-hidden="true" style={{ ['--mx' as any]: `${pointer.x}px`, ['--my' as any]: `${pointer.y}px` }} />
+      {particles.map((particle, index) => (
+        <span
+          key={index}
+          className="particle"
+          style={{
+            left: particle.left,
+            top: particle.top,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            animationDelay: `${particle.delay}s`,
+          }}
+          aria-hidden="true"
+        />
+      ))}
 
       <header className="relative z-10 border-b border-white/8 px-6 py-4 glass-panel">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -499,7 +652,8 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.42, delay: index * 0.08, ease: "easeOut" }}
-              className="glass-card rounded-2xl p-4"
+              className="premium-card glass-card rounded-2xl p-4"
+              whileHover={{ y: -4, scale: 1.01 }}
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-[12px] text-[#666f82]">{metric.label}</span>
@@ -516,7 +670,8 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card rounded-3xl p-6"
+            className="premium-card glass-card rounded-3xl p-6"
+            whileHover={{ y: -2 }}
           >
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -570,7 +725,7 @@ export default function DashboardPage() {
           <InsightCarousel />
         </div>
 
-        <div className="mb-8 glass-card rounded-3xl p-5">
+        <div className="premium-card mb-8 glass-card rounded-3xl p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-[12px] uppercase tracking-[0.2em] text-slate-400">Processing flow</p>
@@ -617,7 +772,7 @@ export default function DashboardPage() {
               </div>
             </motion.button>
           ) : (
-            <div className="glass-card rounded-3xl p-6">
+            <div className="premium-card glass-card rounded-3xl p-6">
               <h3 className="display text-[18px] font-semibold mb-4">Upload Dataset</h3>
               <form onSubmit={handleUpload} className="space-y-4">
                 <div>
@@ -645,7 +800,7 @@ export default function DashboardPage() {
                 </div>
 
                 {uploadFile && (
-                  <div className="rounded-2xl border border-white/10 bg-[#0A1220]/90 p-4">
+                  <div className="premium-card rounded-2xl border border-white/10 bg-[#0A1220]/90 p-4">
                     <div className="mb-3 flex items-center justify-between gap-3">
                       <div>
                         <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">Live dataset preview</p>
@@ -721,7 +876,11 @@ export default function DashboardPage() {
                               </div>
                               <div className="flex flex-wrap gap-2">
                                 {previewMetrics.alerts.map((alert) => (
-                                  <span key={alert} className="rounded-full border border-white/10 bg-[#0D1424] px-2 py-1 text-[10px] text-slate-200">
+                                  <span
+                                    key={alert}
+                                    className="rounded-full border border-white/10 bg-[#0D1424] px-2 py-1 text-[10px] text-slate-200"
+                                    style={{ boxShadow: alert.includes("success") || alert.includes("healthy") ? "0 0 18px rgba(52,211,153,0.2)" : "0 0 18px rgba(251,191,36,0.12)" }}
+                                  >
                                     {alert}
                                   </span>
                                 ))}
@@ -834,7 +993,7 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.45, delay: index * 0.07, ease: "easeOut" }}
                     onClick={() => router.push(`/dashboard/dataset/${dataset.id}`)}
-                    className="card-hover cursor-pointer rounded-3xl border border-white/10 glass-card p-5"
+                    className="card-hover premium-card cursor-pointer rounded-3xl border border-white/10 glass-card p-5"
                   >
                     <div className="mb-4 flex items-start justify-between gap-3">
                       <div className="rounded-2xl bg-[#6C7CFB]/12 p-2.5 text-[#8aa2ff]">
@@ -860,13 +1019,21 @@ export default function DashboardPage() {
 
                     <div className="space-y-3 mb-4">
                       {[{ label: "Null %", value: nullPct, color: "#60a5fa" }, { label: "Duplicates %", value: duplicatePct, color: "#fbbf24" }].map((bar) => (
-                        <div key={bar.label}>
+                        <div key={bar.label} className="alert-card">
                           <div className="mb-1 flex items-center justify-between text-[11px] text-slate-300">
                             <span>{bar.label}</span>
-                            <span>{bar.value.toFixed(1)}%</span>
+                            <span style={{ color: bar.color }}>{bar.value.toFixed(1)}%</span>
                           </div>
-                          <div className="h-2 w-full overflow-hidden rounded-full bg-white/6">
-                            <div className="h-full rounded-full" style={{ width: `${Math.min(bar.value, 100)}%`, background: bar.color }} />
+                          <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/6">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${Math.min(bar.value, 100)}%` }}
+                              transition={{ duration: 0.8, ease: "easeOut" }}
+                              className="relative h-full rounded-full"
+                              style={{ background: `linear-gradient(90deg, ${bar.color}, #9A6BFF)` }}
+                            >
+                              <span className="progress-shine" />
+                            </motion.div>
                           </div>
                         </div>
                       ))}
