@@ -1,7 +1,10 @@
 // API service for frontend-backend communication
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = configuredApiUrl.replace(/\/+$/, '').endsWith('/api')
+  ? configuredApiUrl.replace(/\/+$/, '')
+  : `${configuredApiUrl.replace(/\/+$/, '')}/api`;
 
-export const apiCall = async (endpoint: string, method: string = 'GET', data: any = null, token: string | null = null) => {
+export const apiCall = async (endpoint: string, method: string = 'GET', data: unknown = null, token: string | null = null) => {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
@@ -19,7 +22,13 @@ export const apiCall = async (endpoint: string, method: string = 'GET', data: an
     config.body = JSON.stringify(data);
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+  } catch {
+    throw new Error('Unable to reach the API. Start the Flask backend on http://localhost:5000 and try again.');
+  }
+
   const result = await response.json();
 
   if (!response.ok) {
