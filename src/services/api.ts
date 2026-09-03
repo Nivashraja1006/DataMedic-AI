@@ -1,5 +1,12 @@
 // API service for frontend-backend communication
-const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL || (
+  process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : ''
+);
+
+if (!configuredApiUrl) {
+  throw new Error('NEXT_PUBLIC_API_URL is required in production. Configure it with the deployed Flask API URL.');
+}
+
 const API_BASE_URL = configuredApiUrl.replace(/\/+$/, '').endsWith('/api')
   ? configuredApiUrl.replace(/\/+$/, '')
   : `${configuredApiUrl.replace(/\/+$/, '')}/api`;
