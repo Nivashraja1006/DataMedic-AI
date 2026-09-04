@@ -22,14 +22,10 @@ except Exception:  # pragma: no cover - optional dependency
     openai = None
 
 app = Flask(__name__)
-CORS(app, resources={
-    r"/*": {
-        "origins": ["http://localhost:3000"],
-        "methods": ["GET", "POST", "PUT", "DELETE"],
-        "allow_headers": ["Content-Type"],
-        "supports_credentials": True,
-    }
-})
+CORS(app, origins=[
+    "http://localhost:3000",
+    "https://your-vercel-app.vercel.app",
+])
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
@@ -37,8 +33,25 @@ app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-k
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'uploads')
 app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
+app.config['ENVIRONMENT'] = os.environ.get('FLASK_ENV', 'production')
 
 jwt = JWTManager(app)
+
+
+@app.errorhandler(400)
+def handle_bad_request(error):
+    return jsonify({'error': 'Bad request', 'details': str(error)}), 400
+
+
+@app.errorhandler(404)
+def handle_not_found(error):
+    return jsonify({'error': 'Endpoint not found'}), 404
+
+
+@app.errorhandler(500)
+def handle_server_error(error):
+    app.logger.exception('Unhandled API error')
+    return jsonify({'error': 'Internal server error'}), 500
 
 # Ensure upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -835,4 +848,5 @@ def copilot():
     return jsonify({"answer": default_answer}), 200
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get('PORT', '5000'))
+    app.run(host="0.0.0.0", port=port, debug=os.environ.get('FLASK_DEBUG', '0') == '1')

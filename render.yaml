@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: datamedic-backend
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FRONTEND_URL
+        value: https://your-vercel-app.vercel.app

@@ -1,11 +1,12 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-export const API_BASE_URL = API_BASE;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
+const API_BASE = API_URL;
+export const API_BASE_URL = API_URL;
 
 export { API_BASE };
 
-console.log("API URL:", API_BASE);
+console.log("API URL:", API_URL);
 
-if (!API_BASE) {
+if (!API_URL) {
 	throw new Error("NEXT_PUBLIC_API_URL is not configured.");
 }
 
@@ -33,7 +34,7 @@ const parseAuthResponse = async (response: Response) => {
 
 export async function registerUser(data: AuthData) {
 	try {
-		const response = await fetch(`${API_BASE}/register`, {
+		const response = await fetch(`${API_URL}/register`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(data),
@@ -42,13 +43,13 @@ export async function registerUser(data: AuthData) {
 	} catch (error) {
 		console.error(error);
 		if (error instanceof Error) throw error;
-		throw new Error(`Unable to reach the API at ${API_BASE}. Start the Flask backend and try again.`);
+		throw new Error(`Unable to reach the API at ${API_URL}. Start the Flask backend and try again.`);
 	}
 }
 
 export async function loginUser(data: AuthData) {
 	try {
-		const response = await fetch(`${API_BASE}/login`, {
+		const response = await fetch(`${API_URL}/login`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(data),
@@ -57,6 +58,6 @@ export async function loginUser(data: AuthData) {
 	} catch (error) {
 		console.error(error);
 		if (error instanceof Error) throw error;
-		throw new Error(`Unable to reach the API at ${API_BASE}. Start the Flask backend and try again.`);
+		throw new Error(`Unable to reach the API at ${API_URL}. Start the Flask backend and try again.`);
 	}
 }

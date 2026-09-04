@@ -25,6 +25,17 @@ The API runs at http://127.0.0.1:5000. Upload a CSV, Excel, or JSON file to `POS
 
 The dashboard ships with realistic workspace data and a functional Copilot modal so the product can be evaluated immediately. For local development, set `NEXT_PUBLIC_API_URL=http://127.0.0.1:5000`. For a deployed frontend, set the Vercel environment variable `NEXT_PUBLIC_API_URL` to the public Flask API origin, for example `https://your-api.example.com`. Deploy the Flask backend first and verify `https://your-api.example.com/api/health` returns `{"status":"ok"}`.
 
+## Deploy the Flask API to Render
+
+1. Push this repository to GitHub and create a Render Blueprint from `render.yaml`.
+2. In the Render service environment, set `FRONTEND_URL` to the deployed Vercel origin, for example `https://your-app.vercel.app`.
+3. Render installs `backend/requirements.txt` and starts the API with `gunicorn --bind 0.0.0.0:$PORT app:app`.
+4. Copy the deployed Render URL and set this Vercel environment variable:
+
+	`NEXT_PUBLIC_API_URL=https://your-backend-url.onrender.com`
+
+5. Redeploy Vercel after changing the environment variable, then verify `/api/health`, `/register`, and `/login` against the Render URL.
+
 ## Getting Started
 
 First, run the development server:

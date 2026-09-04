@@ -36,7 +36,9 @@ export const apiCall = async (endpoint: string, method: string = 'GET', data: un
   let response: Response;
   try {
     response = await fetch(`${apiOrigin}${endpoint}`, config);
-  } catch {
+  Render:
+  FRONTEND_URL=https://your-vercel-app.vercel.app  } catch (error) {
+    console.error(error);
     throw new Error(`Unable to reach the API at ${apiOrigin}. Start the Flask backend and try again.`);
   }
 
@@ -83,7 +85,8 @@ export const datasetService = {
       headers,
       body: formData,
       });
-    } catch {
+    } catch (error) {
+      console.error(error);
       throw new Error(`Unable to reach the API at ${apiOrigin}. Start the Flask backend and try again.`);
     }
 
