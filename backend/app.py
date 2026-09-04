@@ -22,7 +22,14 @@ except Exception:  # pragma: no cover - optional dependency
     openai = None
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={
+    r"/*": {
+        "origins": ["http://localhost:3000"],
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "allow_headers": ["Content-Type"],
+        "supports_credentials": True,
+    }
+})
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
@@ -435,8 +442,10 @@ def health():
 # ===== AUTHENTICATION ENDPOINTS =====
 
 @app.post("/api/auth/signup")
+@app.post("/register")
 def signup():
     """User registration"""
+    print("Register endpoint hit")
     data = request.get_json()
     
     if not data or not data.get('username') or not data.get('email') or not data.get('password'):
@@ -460,16 +469,17 @@ def signup():
     
     access_token = create_access_token(identity=data['email'])
     return jsonify({
-        'message': 'User created successfully',
+        'message': 'User registered successfully',
         'access_token': access_token,
         'user': {
             'username': data['username'],
             'email': data['email'],
             'role': users[data['email']]['role']
         }
-    }), 201
+    }), 200
 
 @app.post("/api/auth/login")
+@app.post("/login")
 def login():
     """User login"""
     data = request.get_json()

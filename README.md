@@ -21,9 +21,9 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The API runs at http://localhost:5000. Upload a CSV, Excel, or JSON file to `POST /api/analyze` using the `file` field. `GET /api/health` is available for checks and `POST /api/copilot` accepts `{ "question": "What should I fix first?" }`.
+The API runs at http://127.0.0.1:5000. Upload a CSV, Excel, or JSON file to `POST /api/analyze` using the `file` field. `GET /api/health` is available for checks and `POST /api/copilot` accepts `{ "question": "What should I fix first?" }`.
 
-The dashboard ships with realistic workspace data and a functional Copilot modal so the product can be evaluated immediately. For local development, the frontend uses `http://localhost:5000/api` automatically. For a deployed frontend, set the Vercel environment variable `NEXT_PUBLIC_API_URL` to the public Flask API origin, for example `https://your-api.example.com` (the frontend adds `/api` automatically). Deploy the Flask backend first and verify `https://your-api.example.com/api/health` returns `{"status":"ok"}`.
+The dashboard ships with realistic workspace data and a functional Copilot modal so the product can be evaluated immediately. For local development, set `NEXT_PUBLIC_API_URL=http://127.0.0.1:5000`. For a deployed frontend, set the Vercel environment variable `NEXT_PUBLIC_API_URL` to the public Flask API origin, for example `https://your-api.example.com`. Deploy the Flask backend first and verify `https://your-api.example.com/api/health` returns `{"status":"ok"}`.
 
 ## Getting Started
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { Mail, Lock, User, Sparkles, ArrowRight, AlertCircle } from "lucide-react";
+import { Mail, Lock, User, Sparkles, ArrowRight, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -13,17 +13,19 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !success) {
       router.push("/dashboard");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, success]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -39,9 +41,10 @@ export default function SignupPage() {
 
     try {
       await signup(username, email, password);
-      router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Signup failed");
+      setSuccess("Account created successfully. Redirecting to your dashboard...");
+      setTimeout(() => router.push("/dashboard"), 900);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -75,6 +78,13 @@ export default function SignupPage() {
           <div className="mb-6 p-4 rounded-lg border border-[#FF6B75]/30 bg-[#FF6B75]/10 flex items-center gap-2">
             <AlertCircle size={16} className="text-[#FF6B75]" />
             <p className="text-[#FF6B75] text-[13px]">{error}</p>
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-6 p-4 rounded-lg border border-[#2FD9C4]/30 bg-[#2FD9C4]/10 flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-[#2FD9C4]" />
+            <p className="text-[#2FD9C4] text-[13px]">{success}</p>
           </div>
         )}
 
@@ -144,7 +154,7 @@ export default function SignupPage() {
             disabled={loading}
             className="glow-btn w-full mt-6 py-2.5 rounded-lg bg-gradient-to-r from-[#6C7CFB] to-[#9A6BFF] text-white font-medium text-[14px] flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {loading ? "Creating account..." : <>Create account <ArrowRight size={16} /></>}
+            {loading ? <><Loader2 size={16} className="animate-spin" /> Creating account...</> : <>Create account <ArrowRight size={16} /></>}
           </button>
         </form>
 

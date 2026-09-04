@@ -1,15 +1,19 @@
 // API service for frontend-backend communication
-const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL || (
-  process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : ''
-);
+import { API_BASE, loginUser, registerUser } from '@/lib/api';
 
-if (!configuredApiUrl) {
-  throw new Error('NEXT_PUBLIC_API_URL is required in production. Configure it with the deployed Flask API URL.');
-}
+const apiOrigin = API_BASE.replace(/\/+$/, '');
 
-const API_BASE_URL = configuredApiUrl.replace(/\/+$/, '').endsWith('/api')
-  ? configuredApiUrl.replace(/\/+$/, '')
-  : `${configuredApiUrl.replace(/\/+$/, '')}/api`;
+const getErrorMessage = async (response: Response) => {
+  const text = await response.text();
+  if (!text) return `API request failed (${response.status})`;
+
+  try {
+    const result = JSON.parse(text);
+    return result.error || result.message || `API request failed (${response.status})`;
+  } catch {
+    return text;
+  }
+};
 
 export const apiCall = async (endpoint: string, method: string = 'GET', data: unknown = null, token: string | null = null) => {
   const headers: HeadersInit = {
@@ -31,39 +35,37 @@ export const apiCall = async (endpoint: string, method: string = 'GET', data: un
 
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    response = await fetch(`${apiOrigin}${endpoint}`, config);
   } catch {
-    throw new Error('Unable to reach the API. Start the Flask backend on http://localhost:5000 and try again.');
+    throw new Error(`Unable to reach the API at ${apiOrigin}. Start the Flask backend and try again.`);
   }
-
-  const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.error || 'API call failed');
+    throw new Error(await getErrorMessage(response));
   }
 
-  return result;
+  return response.json();
 };
 
 // Auth service
 export const authService = {
   signup: (username: string, email: string, password: string) =>
-    apiCall('/auth/signup', 'POST', { username, email, password }),
+    registerUser({ username, email, password }),
 
   login: (email: string, password: string) =>
-    apiCall('/auth/login', 'POST', { email, password }),
+    loginUser({ email, password }),
 
   getProfile: (token: string) =>
-    apiCall('/auth/me', 'GET', null, token),
+    apiCall('/api/auth/me', 'GET', null, token),
 };
 
 // Dataset service
 export const datasetService = {
   getDatasets: (token: string) =>
-    apiCall('/datasets', 'GET', null, token),
+    apiCall('/api/datasets', 'GET', null, token),
 
   getDataset: (datasetId: number, token: string) =>
-    apiCall(`/datasets/${datasetId}`, 'GET', null, token),
+    apiCall(`/api/datasets/${datasetId}`, 'GET', null, token),
 
   uploadDataset: async (file: File, name: string, token: string) => {
     const formData = new FormData();
@@ -74,33 +76,37 @@ export const datasetService = {
       Authorization: `Bearer ${token}`,
     };
 
-    const response = await fetch(`${API_BASE_URL}/datasets/upload`, {
+    let response: Response;
+    try {
+      response = await fetch(`${apiOrigin}/api/datasets/upload`, {
       method: 'POST',
       headers,
       body: formData,
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || 'Upload failed');
+      });
+    } catch {
+      throw new Error(`Unable to reach the API at ${apiOrigin}. Start the Flask backend and try again.`);
     }
-    return result;
+
+    if (!response.ok) {
+      throw new Error(await getErrorMessage(response));
+    }
+    return response.json();
   },
 
   profileDataset: (datasetId: number, token: string) =>
-    apiCall(`/datasets/${datasetId}/profile`, 'POST', {}, token),
+    apiCall(`/api/datasets/${datasetId}/profile`, 'POST', {}, token),
 
   analyzeDataset: (datasetId: number, token: string) =>
-    apiCall(`/datasets/${datasetId}/analyze`, 'POST', {}, token),
+    apiCall(`/api/datasets/${datasetId}/analyze`, 'POST', {}, token),
 
   detectIssues: (datasetId: number, token: string) =>
-    apiCall(`/datasets/${datasetId}/detect-issues`, 'POST', {}, token),
+    apiCall(`/api/datasets/${datasetId}/detect-issues`, 'POST', {}, token),
 
   scoreDataset: (datasetId: number, token: string) =>
-    apiCall(`/datasets/${datasetId}/score`, 'POST', {}, token),
+    apiCall(`/api/datasets/${datasetId}/score`, 'POST', {}, token),
 
   getIssues: (datasetId: number, token: string, severity?: string) => {
-    let endpoint = `/datasets/${datasetId}/issues`;
+    let endpoint = `/api/datasets/${datasetId}/issues`;
     if (severity) endpoint += `?severity=${severity}`;
     return apiCall(endpoint, 'GET', null, token);
   },
@@ -109,5 +115,5 @@ export const datasetService = {
 // Copilot service
 export const copilotService = {
   ask: (question: string, datasetId?: number) =>
-    apiCall('/copilot', 'POST', { question, dataset_id: datasetId }),
+    apiCall('/api/copilot', 'POST', { question, dataset_id: datasetId }),
 };
