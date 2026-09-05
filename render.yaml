@@ -1,9 +1,10 @@
 services:
   - type: web
-    name: datamedic-backend
-    env: python
-    buildCommand: pip install --upgrade pip && pip install -r backend/requirements.txt
-    startCommand: gunicorn --chdir backend --bind 0.0.0.0:$PORT app:app
+    name: datamedic-ai
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
     envVars:
       - key: FRONTEND_URL
         sync: false
