@@ -22,10 +22,8 @@ except Exception:  # pragma: no cover - optional dependency
     openai = None
 
 app = Flask(__name__)
-CORS(app, origins=[
-    "http://localhost:3000",
-    "https://your-vercel-app.vercel.app",
-])
+frontend_url = os.environ.get("FRONTEND_URL")
+CORS(app, origins=[frontend_url] if frontend_url else ["http://localhost:3000"])
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
@@ -848,5 +846,5 @@ def copilot():
     return jsonify({"answer": default_answer}), 200
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', '5000'))
+    port = int(os.environ.get('PORT', 10000))
     app.run(host="0.0.0.0", port=port, debug=os.environ.get('FLASK_DEBUG', '0') == '1')
