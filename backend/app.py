@@ -1,8 +1,10 @@
 import hashlib
 import io
+import json
 import os
 import secrets
 from datetime import datetime, timezone
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -19,6 +21,7 @@ users = {}
 tokens = {}
 datasets = {}
 next_dataset_id = 1
+DATASETS_FILE = Path(os.environ.get("DATASETS_FILE", Path(__file__).with_name("datasets.json")))
 
 
 def now_iso():
@@ -110,6 +113,41 @@ def public_dataset(dataset):
     return {key: value for key, value in dataset.items() if key != "frame"}
 
 
+def load_datasets():
+    if not DATASETS_FILE.exists():
+        return {}, 1
+
+    try:
+        stored_datasets = json.loads(DATASETS_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}, 1
+
+    loaded = {}
+    for item in stored_datasets:
+        frame_data = item.pop("frame", {"columns": [], "data": []})
+        dataset_id = int(item["id"])
+        loaded[dataset_id] = {
+            **item,
+            "id": dataset_id,
+            "frame": pd.DataFrame(frame_data.get("data", []), columns=frame_data.get("columns", [])),
+        }
+
+    return loaded, max(loaded, default=0) + 1
+
+
+def persist_datasets():
+    DATASETS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    stored_datasets = []
+    for dataset in datasets.values():
+        item = public_dataset(dataset)
+        item["frame"] = json.loads(dataset["frame"].to_json(orient="split", date_format="iso"))
+        stored_datasets.append(item)
+    DATASETS_FILE.write_text(json.dumps(stored_datasets), encoding="utf-8")
+
+
+datasets, next_dataset_id = load_datasets()
+
+
 @app.get("/")
 def home():
     return {"status": "success", "message": "Backend running"}
@@ -187,6 +225,7 @@ def upload_dataset(require_auth=True):
         "frame": frame,
     }
     datasets[dataset_id] = dataset
+    persist_datasets()
     return jsonify({"dataset": public_dataset(dataset)}), 201
 
 
@@ -208,6 +247,17 @@ def list_datasets():
     return jsonify([public_dataset(item) for item in datasets.values() if item["owner"] == user["email"]])
 
 
+@app.get("/api/datasets/<int:dataset_id>")
+def get_dataset(dataset_id):
+    user, error = require_user()
+    if error:
+        return error
+    dataset = datasets.get(dataset_id)
+    if dataset is None or dataset["owner"] != user["email"]:
+        return jsonify({"error": "Dataset not found"}), 404
+    return jsonify(public_dataset(dataset))
+
+
 @app.post("/api/datasets/<int:dataset_id>/analyze")
 def analyze_dataset(dataset_id):
     user, error = require_user()
@@ -218,7 +268,70 @@ def analyze_dataset(dataset_id):
         return jsonify({"error": "Dataset not found"}), 404
     dataset["analysis"] = dataset_analysis(dataset["frame"])
     dataset["quality_score"] = dataset["analysis"]["quality_score"]
+    persist_datasets()
     return jsonify(dataset["analysis"])
+
+
+@app.post("/api/datasets/<int:dataset_id>/profile")
+def profile_dataset(dataset_id):
+    user, error = require_user()
+    if error:
+        return error
+    dataset = datasets.get(dataset_id)
+    if dataset is None or dataset["owner"] != user["email"]:
+        return jsonify({"error": "Dataset not found"}), 404
+
+    frame = dataset["frame"]
+    columns_profile = [
+        {
+            "name": column,
+            "type": str(frame[column].dtype),
+            "null_count": int(frame[column].isna().sum()),
+            "null_percent": round(float(frame[column].isna().mean() * 100), 2),
+            "unique_count": int(frame[column].nunique(dropna=True)),
+        }
+        for column in frame.columns
+    ]
+    return jsonify({"columns_profile": columns_profile})
+
+
+@app.get("/api/datasets/<int:dataset_id>/issues")
+def get_dataset_issues(dataset_id):
+    user, error = require_user()
+    if error:
+        return error
+    dataset = datasets.get(dataset_id)
+    if dataset is None or dataset["owner"] != user["email"]:
+        return jsonify({"error": "Dataset not found"}), 404
+    issues = dataset["analysis"].get("issues", [])
+    severity = request.args.get("severity")
+    if severity:
+        issues = [issue for issue in issues if issue.get("severity") == severity]
+    return jsonify(issues)
+
+
+@app.post("/api/datasets/<int:dataset_id>/detect-issues")
+def detect_dataset_issues(dataset_id):
+    user, error = require_user()
+    if error:
+        return error
+    dataset = datasets.get(dataset_id)
+    if dataset is None or dataset["owner"] != user["email"]:
+        return jsonify({"error": "Dataset not found"}), 404
+    dataset["analysis"] = dataset_analysis(dataset["frame"])
+    persist_datasets()
+    return jsonify({"issues": dataset["analysis"].get("issues", [])})
+
+
+@app.post("/api/datasets/<int:dataset_id>/score")
+def score_dataset(dataset_id):
+    user, error = require_user()
+    if error:
+        return error
+    dataset = datasets.get(dataset_id)
+    if dataset is None or dataset["owner"] != user["email"]:
+        return jsonify({"error": "Dataset not found"}), 404
+    return jsonify({"quality_score": dataset["analysis"].get("quality_score", dataset["quality_score"])})
 
 
 @app.post("/api/copilot")
