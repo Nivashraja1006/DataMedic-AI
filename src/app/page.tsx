@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
@@ -164,17 +164,45 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
-function AnimatedPercent({ value }: { value: number }) {
+function AnimatedPercent({ value, delay }: { value: number; delay: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    let frameId = 0;
+    let startTime = 0;
+    const duration = 1100;
+    const timeoutId = window.setTimeout(() => {
+      const animate = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        setDisplayValue(Math.round(value * easedProgress));
+        if (progress < 1) frameId = window.requestAnimationFrame(animate);
+      };
+
+      frameId = window.requestAnimationFrame(animate);
+    }, delay);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [delay, value]);
+
   return (
-    <motion.span
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: "easeOut" }}
-      className="text-[10px] uppercase tracking-[0.18em] text-slate-300"
-    >
-      {value}%
-    </motion.span>
+    <span className="text-[10px] uppercase tracking-[0.18em] text-slate-300">{displayValue}%</span>
   );
+}
+
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  return <span>{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}</span>;
 }
 
 export default function LandingPage() {
@@ -394,171 +422,159 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             className="mx-auto mb-10 max-w-3xl text-center"
           >
-            <p className="mb-3 text-[12px] uppercase tracking-[0.2em] text-[#7B91FF]">Live Data Flow</p>
+            <p className="mb-3 text-[12px] uppercase tracking-[0.2em] text-[#8b5cf6]">Live Data Flow</p>
             <h2 className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">A real-time pipeline processing data across every stage.</h2>
           </motion.div>
 
-          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <motion.div
+          <div className="grid gap-5 lg:grid-cols-[1.3fr_0.7fr]">
+            <motion.section
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
-              className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#050d18]/90 p-5 shadow-[0_30px_80px_rgba(2,6,23,0.6)] backdrop-blur-xl"
-              layout={false}
+              className="relative overflow-hidden rounded-[28px] border border-[#1c2130] bg-[#0a0c12] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.4)] md:p-7"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(138,160,255,0.18),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(91,182,177,0.12),_transparent_28%)]" />
-              <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] [background-size:28px_28px]" />
-
-              <div className="relative z-10 mb-5 flex items-center justify-between">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Pipeline status</div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#8aa0ff]/20 bg-[#8aa0ff]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#dfe7ff] shadow-[0_0_18px_rgba(138,160,255,0.14)]">
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#5bb6b1]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_0%,rgba(139,92,246,0.12),transparent_34%),radial-gradient(circle_at_92%_100%,rgba(52,211,153,0.08),transparent_32%)]" />
+              <div className="relative z-10 mb-10 flex items-center justify-between">
+                <div>
+                  <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.22em] text-[#8b5cf6]">Pipeline status</div>
+                  <h3 className="text-lg font-semibold text-white">Ingestion pipeline</h3>
+                </div>
+                <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#aeb4c5]">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#8b5cf6] shadow-[0_0_12px_rgba(139,92,246,0.9)]" />
                   Processing
                 </div>
               </div>
 
-              <div className="relative z-10 overflow-hidden rounded-[26px] border border-white/10 bg-[#08131d]/85 p-4">
-                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#8aa0ff]/8 to-transparent" />
-                <div className="absolute inset-x-4 bottom-8 h-20 opacity-80">
-                  <svg viewBox="0 0 600 120" preserveAspectRatio="none" className="h-full w-full" aria-hidden="true">
-                    <path d="M 0 62 C 42 60, 60 90, 110 58 S 180 28, 240 62 S 320 90, 390 56 S 480 32, 600 70" fill="none" stroke="rgba(138,160,255,0.5)" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M 0 76 C 58 80, 96 44, 146 70 S 224 96, 300 62 S 394 36, 470 74 S 548 84, 600 62" fill="none" stroke="rgba(91,182,177,0.45)" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                </div>
+              <div className="relative z-10 -mx-1 overflow-x-auto pb-2">
+                <div className="pipeline-track relative flex min-w-[700px] items-start justify-between px-3">
+                  <div className="absolute left-[10%] right-[10%] top-9 h-px bg-[#1c2130]" />
+                  <div className="pipeline-trail absolute left-[10%] top-[33px] h-[3px] w-24 rounded-full bg-gradient-to-r from-transparent via-[#8b5cf6] to-[#34d399] shadow-[0_0_14px_rgba(139,92,246,0.8)]" />
 
-                <div className="relative mb-4 flex items-center justify-between gap-2">
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Flow</div>
-                  <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/5">
-                    <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-[#8aa0ff] via-[#9a6bff] to-[#5bb6b1]" />
-                  </div>
-                </div>
+                  {flowSteps.map((step, index) => {
+                    const Icon = step.icon;
+                    const completed = step.progress >= 100;
+                    const progressDelay = 260 + index * 330;
 
-                <div className="relative">
-                  <div className="absolute left-6 right-6 top-1/2 hidden h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent md:block" />
-                  <div className="absolute left-10 right-10 top-1/2 hidden h-10 -translate-y-1/2 md:block">
-                    {[...Array(12)].map((_, particleIndex) => (
-                      <span
-                        key={particleIndex}
-                        className="absolute top-1/2 h-1.5 w-1.5 rounded-full bg-[#8aa0ff] shadow-[0_0_12px_rgba(138,160,255,0.85)] opacity-70"
-                        style={{
-                          left: `${(particleIndex / 12) * 100}%`,
-                          transform: "translateY(-50%)",
-                        }}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="relative grid gap-3 md:grid-cols-5">
-                    {flowSteps.map((step, index) => {
-                      const Icon = step.icon;
-                      const active = index < flowSteps.length - 1 || step.progress >= 90;
-
-                      return (
-                        <motion.div
-                          key={step.label}
-                          initial={{ opacity: 0, y: 14 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true, amount: 0.25 }}
-                          transition={{ duration: 0.45, delay: index * 0.08, ease: [0.4, 0, 0.2, 1] }}
-                          whileHover={{ y: -4, scale: 1.02 }}
-                          className="relative"
-                        >
-                          <motion.div
-                            transition={{ duration: 0.2, ease: "easeOut" }}
-                            className={`relative overflow-hidden rounded-[22px] border p-3.5 ${active ? "border-[#8aa0ff]/30 bg-[#0d1a2b]/95" : "border-white/8 bg-white/[0.025]"}`}
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
-                            <div className="relative z-10">
-                              <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl border ${active ? "border-[#8aa0ff]/30 bg-[#0f2338] text-[#edf2ff] shadow-[0_0_18px_rgba(138,160,255,0.18)]" : "border-white/5 bg-[#111b2b] text-slate-400"}`}>
-                                <Icon className="h-4 w-4" />
-                              </div>
-
-                              <div className="mb-2 flex items-center justify-between gap-2">
-                                <span className="text-[11px] font-medium text-white">{step.label}</span>
-                                <AnimatedPercent value={step.progress} />
-                              </div>
-
-                              <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${step.progress}%` }}
-                                  transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 + index * 0.08 }}
-                                  className={`h-full rounded-full ${active ? "bg-gradient-to-r from-[#8aa0ff] via-[#9a6bff] to-[#5bb6b1] shadow-[0_0_16px_rgba(138,160,255,0.5)]" : "bg-slate-600"}`}
-                                />
-                              </div>
-                            </div>
-                          </motion.div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
+                    return (
+                      <motion.div
+                        key={step.label}
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{ duration: 0.4, delay: index * 0.08 }}
+                        className="relative z-10 flex w-28 flex-col items-center text-center"
+                      >
+                        <div className={`relative flex h-[74px] w-[74px] items-center justify-center rounded-full border bg-[#0a0c12] transition-colors duration-500 ${completed ? "border-[#34d399] text-[#34d399] shadow-[0_0_24px_rgba(52,211,153,0.3)]" : "border-[#8b5cf6]/50 text-[#c4b5fd]"}`}>
+                          {!completed && <span className="absolute -inset-1 rounded-full border border-transparent border-t-[#8b5cf6] border-r-[#8b5cf6]/40 animate-spin" />}
+                          <span className={`flex h-12 w-12 items-center justify-center rounded-full ${completed ? "bg-[#34d399]/10" : "bg-[#8b5cf6]/10"}`}>
+                            <Icon className="h-5 w-5" />
+                          </span>
+                        </div>
+                        <span className="mt-4 font-mono text-[11px] text-[#e5e7eb]">{step.label}</span>
+                        <AnimatedPercent value={step.progress} delay={progressDelay} />
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </div>
-            </motion.div>
+            </motion.section>
 
-            <motion.div
+            <motion.section
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1], delay: 0.08 }}
-              className="rounded-[34px] border border-white/10 bg-[#060d18]/90 p-5 shadow-[0_30px_80px_rgba(2,6,23,0.62)] backdrop-blur-xl"
+              className="relative overflow-hidden rounded-[28px] border border-[#1c2130] bg-[#0a0c12] shadow-[0_30px_80px_rgba(0,0,0,0.4)]"
             >
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-2.5 w-2.5 items-center justify-center">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#5bb6b1]/80 opacity-80" />
-                    <span className="relative h-2 w-2 rounded-full bg-[#5bb6b1]" />
-                  </span>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Reading panel</div>
-                </div>
-                <div className="rounded-full border border-white/10 bg-white/[0.02] px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-300">
-                  processing
-                </div>
+              <div className="flex items-center gap-2 border-b border-[#1c2130] bg-[#05060a] px-4 py-3">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]/80" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]/80" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#34d399]/80" />
+                <span className="ml-2 font-mono text-[10px] text-[#73798b]">session · intake</span>
+                <span className="ml-auto font-mono text-[10px] tabular-nums text-[#73798b]"><LiveClock /></span>
               </div>
 
-              <div className="rounded-[24px] border border-white/10 bg-[#09151f] p-4">
-                <div className="mb-4 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-400">
-                  <span>session / intake</span>
-                  <span>14:32:08</span>
+              <div className="p-5 md:p-6">
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#8b5cf6]">Reading panel</div>
+                    <h3 className="mt-1 text-lg font-semibold text-white">Live console</h3>
+                  </div>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#34d399]">streaming</span>
                 </div>
 
-                <div className="space-y-2 text-sm text-slate-300">
-                  {[
-                    "Reading file...",
-                    "Analyzing columns...",
-                    "Detecting anomalies...",
-                    "Normalizing values...",
-                    "AI insight ready."
-                  ].map((item, index) => (
-                    <motion.div
-                      key={item}
-                      initial={{ opacity: 0, x: 8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.28, delay: index * 0.07, ease: [0.4, 0, 0.2, 1] }}
-                      className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-2.5 py-2"
-                    >
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#8aa0ff]" />
-                      <span>{item}</span>
-                    </motion.div>
-                  ))}
+                <div className="space-y-3 font-mono text-[11px] leading-5 text-[#73798b]">
+                  {["Reading file...", "Analyzing columns...", "Detecting anomalies...", "Normalizing values...", "AI insight ready."].map((item, index, logs) => {
+                    const isFinal = index === logs.length - 1;
+                    return (
+                      <motion.div
+                        key={item}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35, delay: index * 0.15, ease: [0.4, 0, 0.2, 1] }}
+                        className={`flex gap-2 ${isFinal ? "text-[#34d399]" : ""}`}
+                      >
+                        <span className="shrink-0 text-[#51586a]">{`14:32:${String(8 + index).padStart(2, "0")}`}</span>
+                        <span className={isFinal ? "text-[#34d399]" : "text-[#8b5cf6]"}>{isFinal ? "✓" : "›"}</span>
+                        <span>{item}</span>
+                      </motion.div>
+                    );
+                  })}
                 </div>
 
-                <div className="mt-4 rounded-[18px] border border-white/10 bg-[#0b1a2d] p-3">
-                  <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-slate-400">
-                    <span className="inline-block h-2 w-2 rounded-full bg-[#5bb6b1]" />
-                    Active stream
+                <div className="mt-7 border-t border-[#1c2130] pt-5">
+                  <div className="mb-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-[#73798b]">
+                    <span>Active stream</span>
+                    <span className="text-[#34d399]">live</span>
                   </div>
-
-                  <div className="flex min-h-[52px] items-end gap-1">
-                    {[28, 34, 42, 31, 44, 36, 58, 52, 64, 54, 68, 62, 74, 70, 80, 75, 84, 76, 66, 60].map((bar, index) => (
-                      <span key={`${bar}-${index}`} className="w-1.5 rounded-full bg-gradient-to-t from-[#8aa0ff] to-[#5bb6b1] shadow-[0_0_14px_rgba(91,182,177,0.4)]" style={{ height: `${bar}px` }} />
-                    ))}
-                  </div>
+                  <svg viewBox="0 0 600 110" preserveAspectRatio="none" className="h-24 w-full overflow-visible" aria-label="Animated live data waveform" role="img">
+                    <defs>
+                      <linearGradient id="waveGradient" x1="0%" x2="100%">
+                        <stop offset="0%" stopColor="#8b5cf6" />
+                        <stop offset="52%" stopColor="#22d3ee" />
+                        <stop offset="100%" stopColor="#34d399" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0 57 C35 18 62 90 100 52 S162 24 200 58 S262 92 300 50 S362 20 400 57 S462 90 500 52 S562 26 600 55" fill="none" stroke="#1c2130" strokeWidth="7" strokeLinecap="round" />
+                    <path className="waveform-line" d="M0 57 C35 18 62 90 100 52 S162 24 200 58 S262 92 300 50 S362 20 400 57 S462 90 500 52 S562 26 600 55" fill="none" stroke="url(#waveGradient)" strokeWidth="2.5" strokeLinecap="round" />
+                  </svg>
                 </div>
               </div>
-            </motion.div>
+            </motion.section>
           </div>
+
+          <style jsx>{`
+            .pipeline-trail {
+              animation: pipelineTrail 2.4s linear infinite;
+            }
+
+            .waveform-line {
+              stroke-dasharray: 18 12;
+              animation: waveformDash 2.8s linear infinite, waveformFloat 2.2s ease-in-out infinite;
+              transform-origin: center;
+            }
+
+            @keyframes pipelineTrail {
+              0% { transform: translateX(-115%); opacity: 0; }
+              12% { opacity: 1; }
+              82% { opacity: 1; }
+              100% { transform: translateX(650%); opacity: 0; }
+            }
+
+            @keyframes waveformDash {
+              to { stroke-dashoffset: -60; }
+            }
+
+            @keyframes waveformFloat {
+              0%, 100% { transform: translateY(2px); }
+              50% { transform: translateY(-3px); }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+              .pipeline-trail, .waveform-line { animation: none; }
+            }
+          `}</style>
         </section>
 
         <section id="features" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
