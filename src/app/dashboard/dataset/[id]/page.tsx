@@ -15,13 +15,14 @@ export default function DatasetDetailPage() {
   const router = useRouter();
   const params = useParams();
   const datasetId = Number(params.id);
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [dataset, setDataset] = useState<any>(null);
   const [profiles, setProfiles] = useState<any[]>([]);
   const [issues, setIssues] = useState<any[]>([]);
   const [scores, setScores] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("profile");
   const [profiling, setProfiling] = useState(false);
   const [detecting, setDetecting] = useState(false);
@@ -30,35 +31,46 @@ export default function DatasetDetailPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [copilotInput, setCopilotInput] = useState("");
   const [copilotLoading, setCopilotLoading] = useState(false);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-    loadData();
-  }, [isAuthenticated, token]);
+  const invalidDatasetId = !Number.isInteger(datasetId) || datasetId < 1;
 
   const loadData = async () => {
     setLoading(true);
+    setError("");
     try {
-      const datasetRes = await datasetService.getDataset(datasetId, token!);
+      if (!token) throw new Error("Your session has expired. Please sign in again.");
+
+      const datasetRes = await datasetService.getDataset(datasetId, token);
       setDataset(datasetRes);
 
-      const profileRes = await datasetService.profileDataset(datasetId, token!);
-      setProfiles(profileRes.columns_profile || []);
+      const profileRes = await datasetService.profileDataset(datasetId, token);
+      setProfiles(Array.isArray(profileRes.columns_profile) ? profileRes.columns_profile : []);
 
-      const issuesRes = await datasetService.getIssues(datasetId, token!);
-      setIssues(issuesRes);
+      const issuesRes = await datasetService.getIssues(datasetId, token);
+      setIssues(Array.isArray(issuesRes) ? issuesRes : []);
 
-      const scoreRes = await datasetService.scoreDataset(datasetId, token!);
+      const scoreRes = await datasetService.scoreDataset(datasetId, token);
       setScores(scoreRes);
     } catch (error) {
       console.error("Error loading data:", error);
+      setDataset(null);
+      setError(error instanceof Error ? error.message : "Unable to load this dataset.");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!isAuthenticated || !token) {
+      router.push("/login");
+      return;
+    }
+
+    if (invalidDatasetId) return;
+
+    loadData();
+  }, [authLoading, datasetId, invalidDatasetId, isAuthenticated, router, token]);
 
   const handleProfile = async () => {
     setProfiling(true);
@@ -128,7 +140,7 @@ export default function DatasetDetailPage() {
     return `Based on your dataset analysis, you have ${issues.length} total issues detected. The quality score is ${dataset.quality_score}/100.`;
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-[#05070C] flex items-center justify-center text-white">
         <Sparkles size={48} className="animate-spin" />
@@ -136,11 +148,11 @@ export default function DatasetDetailPage() {
     );
   }
 
-  if (!dataset) {
+  if (invalidDatasetId || !dataset || error) {
     return (
       <div className="min-h-screen bg-[#05070C] flex items-center justify-center text-white">
         <div className="text-center">
-          <p className="mb-4">Dataset not found</p>
+          <p className="mb-4">{invalidDatasetId ? "This dataset link is invalid." : error || "Dataset not found"}</p>
           <button onClick={() => router.push("/dashboard")} className="text-[#6C7CFB] hover:underline">
             Back to Dashboard
           </button>
@@ -259,9 +271,9 @@ export default function DatasetDetailPage() {
                         <td className="px-5 py-3 text-[#D6DBE8] font-medium">{profile.name}</td>
                         <td className="px-3 py-3 text-[#8993A8]">{profile.type}</td>
                         <td className="px-3 py-3" style={{ color: profile.null_percent > 5 ? "#F2B84B" : "#8993A8" }}>
-                          {profile.null_percent.toFixed(1)}%
+                          {Number(profile.null_percent ?? 0).toFixed(1)}%
                         </td>
-                        <td className="px-3 py-3 text-[#8993A8]">{profile.unique_percent.toFixed(1)}%</td>
+                        <td className="px-3 py-3 text-[#8993A8]">{Number(profile.unique_percent ?? 0).toFixed(1)}%</td>
                         <td className="px-3 py-3 text-[#666f82]">{profile.missing_count}</td>
                         <td className="px-3 py-3 text-[#666f82]">{profile.unique_count}</td>
                       </tr>
@@ -374,9 +386,9 @@ export default function DatasetDetailPage() {
                 <div className="rounded-xl border border-white/10 bg-white/[0.02] p-8 text-center">
                   <p className="text-[12px] text-[#666f82] mb-2">Overall Quality Score</p>
                   <p className="display text-[56px] font-bold" style={{
-                    color: scores.overall_score >= 80 ? "#34D399" : scores.overall_score >= 60 ? "#F2B84B" : "#FF6B75"
+                    color: Number(scores.overall_score ?? scores.quality_score ?? 0) >= 80 ? "#34D399" : Number(scores.overall_score ?? scores.quality_score ?? 0) >= 60 ? "#F2B84B" : "#FF6B75"
                   }}>
-                    {scores.overall_score.toFixed(1)}
+                    {Number(scores.overall_score ?? scores.quality_score ?? 0).toFixed(1)}
                   </p>
                   <p className="text-[12px] text-[#8993A8] mt-2">out of 100</p>
                 </div>
@@ -388,14 +400,14 @@ export default function DatasetDetailPage() {
                       <div key={key}>
                         <div className="flex justify-between text-[11px] mb-1">
                           <span className="text-[#B7C0D6] capitalize">{key}</span>
-                          <span className="text-white font-medium">{value.toFixed(0)}</span>
+                          <span className="text-white font-medium">{Number(value ?? 0).toFixed(0)}</span>
                         </div>
                         <div className="h-1.5 rounded-full bg-white/8 overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all"
                             style={{
-                              width: `${Math.min(100, value)}%`,
-                              background: value >= 80 ? "#34D399" : value >= 60 ? "#F2B84B" : "#FF6B75"
+                              width: `${Math.min(100, Number(value) || 0)}%`,
+                              background: Number(value) >= 80 ? "#34D399" : Number(value) >= 60 ? "#F2B84B" : "#FF6B75"
                             }}
                           />
                         </div>

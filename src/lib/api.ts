@@ -22,6 +22,11 @@ function buildApiUrl(path: string) {
   return `${API_URL}${normalizedPath}`;
 }
 
+function tokenFingerprint(token: string | null | undefined) {
+  if (!token) return "missing";
+  return `${token.length}:${token.slice(0, 6)}...${token.slice(-6)}`;
+}
+
 async function readResponseBody(response: Response): Promise<unknown> {
   const text = await response.text();
   if (!text) return null;
@@ -48,6 +53,15 @@ async function getApiError(response: Response) {
 export async function requestJson<T>(path: string, options: ApiOptions = {}): Promise<T> {
   const headers = new Headers(options.headers);
   if (options.token) headers.set("Authorization", `Bearer ${options.token}`);
+  console.debug("[api auth]", {
+    method: options.method || "GET",
+    path,
+    headerPresent: headers.has("Authorization"),
+    token: tokenFingerprint(options.token),
+  });
+  if (process.env.NEXT_PUBLIC_DEBUG_AUTH === "true") {
+    console.warn("[api auth debug] exact token", options.token || "missing");
+  }
   if (options.body && !(options.body instanceof FormData)) {
     headers.set("Content-Type", "application/json");
   }

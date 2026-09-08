@@ -22,6 +22,7 @@ tokens = {}
 datasets = {}
 next_dataset_id = 1
 DATASETS_FILE = Path(os.environ.get("DATASETS_FILE", Path(__file__).with_name("datasets.json")))
+AUTH_FILE = Path(os.environ.get("AUTH_FILE", Path(__file__).with_name("auth.json")))
 
 
 def now_iso():
@@ -41,10 +42,32 @@ def user_payload(user):
     }
 
 
+def token_fingerprint(token):
+    if not token:
+        return "missing"
+    return f"{len(token)}:{token[:6]}...{token[-6:]}"
+
+
 def current_user():
     header = request.headers.get("Authorization", "")
     token = header.removeprefix("Bearer ").strip()
-    return tokens.get(token)
+    loaded_users, loaded_tokens = load_auth()
+    users.clear()
+    users.update(loaded_users)
+    tokens.clear()
+    tokens.update(loaded_tokens)
+    user = tokens.get(token)
+    app.logger.info(
+        "auth request method=%s path=%s header=%s token=%s matched=%s",
+        request.method,
+        request.path,
+        bool(header),
+        token_fingerprint(token),
+        user is not None,
+    )
+    if os.environ.get("DEBUG_AUTH_TOKENS", "").lower() == "true":
+        app.logger.warning("auth debug exact token=%r", token)
+    return user
 
 
 def require_user():
@@ -52,6 +75,35 @@ def require_user():
     if user is None:
         return None, (jsonify({"error": "Authentication required"}), 401)
     return user, None
+
+
+def load_auth():
+    if not AUTH_FILE.exists():
+        return {}, {}
+
+    try:
+        stored_auth = json.loads(AUTH_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}, {}
+
+    loaded_users = {user["email"]: user for user in stored_auth.get("users", [])}
+    loaded_tokens = {
+        token: loaded_users[email]
+        for token, email in stored_auth.get("tokens", {}).items()
+        if email in loaded_users
+    }
+    return loaded_users, loaded_tokens
+
+
+def persist_auth():
+    AUTH_FILE.parent.mkdir(parents=True, exist_ok=True)
+    stored_auth = {
+        "users": list(users.values()),
+        "tokens": {token: user["email"] for token, user in tokens.items()},
+    }
+    temporary_file = AUTH_FILE.with_suffix(f"{AUTH_FILE.suffix}.tmp")
+    temporary_file.write_text(json.dumps(stored_auth), encoding="utf-8")
+    temporary_file.replace(AUTH_FILE)
 
 
 def read_uploaded_file(upload):
@@ -145,6 +197,7 @@ def persist_datasets():
     DATASETS_FILE.write_text(json.dumps(stored_datasets), encoding="utf-8")
 
 
+users, tokens = load_auth()
 datasets, next_dataset_id = load_datasets()
 
 
@@ -172,11 +225,15 @@ def register():
     users[email] = user
     token = secrets.token_urlsafe(32)
     tokens[token] = user
+    persist_auth()
     return jsonify({"access_token": token, "user": user_payload(user)}), 201
 
 
 @app.post("/login")
 def login():
+    loaded_users, loaded_tokens = load_auth()
+    users.update(loaded_users)
+    tokens.update(loaded_tokens)
     body = request.get_json(silent=True) or {}
     email = str(body.get("email", "")).strip().lower()
     user = users.get(email)
@@ -184,6 +241,7 @@ def login():
         return jsonify({"error": "Invalid email or password"}), 401
     token = secrets.token_urlsafe(32)
     tokens[token] = user
+    persist_auth()
     return jsonify({"access_token": token, "user": user_payload(user)})
 
 
@@ -289,6 +347,7 @@ def profile_dataset(dataset_id):
             "null_count": int(frame[column].isna().sum()),
             "null_percent": round(float(frame[column].isna().mean() * 100), 2),
             "unique_count": int(frame[column].nunique(dropna=True)),
+            "unique_percent": round(float(frame[column].nunique(dropna=True) / max(len(frame[column]), 1) * 100), 2),
         }
         for column in frame.columns
     ]

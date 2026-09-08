@@ -23,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+backend/auth.json
+backend/datasets.json
+backend/__pycache__/
 
 # debug
 npm-debug.log*
