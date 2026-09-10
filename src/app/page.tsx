@@ -3,21 +3,18 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Navbar from "@/components/Navbar";
 import ChatWidget from "@/components/ChatWidget";
 import HeroText from "@/components/HeroText";
 import Slideshow from "@/components/Slideshow";
+import SignalFlow from "@/components/SignalFlow";
 import {
-  AlertTriangle,
   ArrowRight,
   BarChart3,
   Bot,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   Database,
   Gauge,
   Layers3,
@@ -26,51 +23,12 @@ import {
   Wand2,
 } from "lucide-react";
 
-const pipelineSteps = [
-  { label: "Upload", icon: Database, progress: "42%", active: false },
-  { label: "Parsing", icon: Sparkles, progress: "58%", active: false },
-  { label: "Cleaning", icon: ShieldCheck, progress: "78%", active: true },
-  { label: "Validation", icon: Gauge, progress: "87%", active: true },
-  { label: "AI Insight", icon: Bot, progress: "96%", active: false },
-];
-
-const chartData = [
-  { name: "Mon", value: 64 },
-  { name: "Tue", value: 68 },
-  { name: "Wed", value: 72 },
-  { name: "Thu", value: 70 },
-  { name: "Fri", value: 85 },
-  { name: "Sat", value: 88 },
-  { name: "Sun", value: 92 },
-];
-
-const liveSignalData = [
-  { name: "T1", value: 38 },
-  { name: "T2", value: 52 },
-  { name: "T3", value: 48 },
-  { name: "T4", value: 66 },
-  { name: "T5", value: 58 },
-  { name: "T6", value: 72 },
-  { name: "T7", value: 64 },
-  { name: "T8", value: 80 },
-  { name: "T9", value: 76 },
-  { name: "T10", value: 88 },
-  { name: "T11", value: 82 },
-  { name: "T12", value: 94 },
-];
-
 const flowSteps = [
   { label: "Upload", progress: 38, active: true, icon: Database },
   { label: "Parsing", progress: 56, active: true, icon: Sparkles },
   { label: "Cleaning", progress: 74, active: true, icon: ShieldCheck },
   { label: "Validation", progress: 86, active: true, icon: Gauge },
   { label: "AI Insight", progress: 96, active: true, icon: Bot },
-];
-
-const alerts = [
-  { label: "Nulls", value: "2.4%", tone: "text-[#60a5fa]" },
-  { label: "Duplicates", value: "0.7%", tone: "text-[#fbbf24]" },
-  { label: "Outliers", value: "4.1%", tone: "text-[#fb7185]" },
 ];
 
 const featureCards = [
@@ -239,7 +197,9 @@ export default function LandingPage() {
             <div className="absolute -left-8 top-8 h-28 w-28 rounded-full bg-[#7b91ff]/20 blur-3xl" />
             <div className="absolute -right-8 bottom-8 h-32 w-32 rounded-full bg-[#5eead4]/20 blur-3xl" />
 
-            <div className="relative mx-auto max-w-[620px] rounded-[32px] border border-white/10 bg-white/[0.03] p-4 shadow-[0_25px_90px_rgba(9,14,25,0.78)] backdrop-blur-xl">
+            <SignalFlow />
+            {/* The signal visualization owns its responsive layout and pointer motion. */}
+            {/*
               <div className="rounded-[28px] border border-white/10 bg-[#09111d]/90 p-4">
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-300">
@@ -409,7 +369,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            */}
           </motion.div>
         </section>
 
