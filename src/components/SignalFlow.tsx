@@ -63,14 +63,15 @@ export default function SignalFlow() {
   };
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    const bounds = panelRef.current?.getBoundingClientRect();
-    if (!bounds) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+    const bounds = panel.getBoundingClientRect();
     targetRef.current = {
       x: ((event.clientY - bounds.top) / bounds.height - 0.5) * -6,
       y: ((event.clientX - bounds.left) / bounds.width - 0.5) * 6,
     };
-    panelRef.current.style.setProperty("--pointer-x", `${((event.clientX - bounds.left) / bounds.width) * 100}%`);
-    panelRef.current.style.setProperty("--pointer-y", `${((event.clientY - bounds.top) / bounds.height) * 100}%`);
+    panel.style.setProperty("--pointer-x", `${((event.clientX - bounds.left) / bounds.width) * 100}%`);
+    panel.style.setProperty("--pointer-y", `${((event.clientY - bounds.top) / bounds.height) * 100}%`);
     if (!frameRef.current) frameRef.current = requestAnimationFrame(updateTilt);
   };
 
