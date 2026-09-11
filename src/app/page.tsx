@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Navbar from "@/components/Navbar";
@@ -19,15 +19,13 @@ import {
   Layers3,
   Flag,
   Quote,
-  ScanSearch,
   ShieldCheck,
-  ShieldAlert,
   Sparkles,
   Star,
-  Upload,
   User,
   Wand2,
 } from "lucide-react";
+import { useRef } from "react";
 
 const flowSteps = [
   { label: "Upload", progress: 38, active: true, icon: Database },
@@ -58,14 +56,6 @@ const featureCards = [
     title: "Real-time Scoring",
     description: "Track data health continuously with a live quality score across all critical dimensions.",
   },
-];
-
-const workflowSteps = [
-  { label: "Upload", icon: Upload },
-  { label: "Profile", icon: ScanSearch },
-  { label: "Score", icon: Gauge },
-  { label: "Detect", icon: ShieldAlert },
-  { label: "Clean", icon: Sparkles },
 ];
 
 const testimonials = [
@@ -122,24 +112,24 @@ function LiveClock() {
 }
 
 function LifecyclePreview() {
-  const [packetPosition, setPacketPosition] = useState(0);
   const [healthScore, setHealthScore] = useState(0);
   const [barsReady, setBarsReady] = useState(false);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const carouselPauseUntil = useRef(0);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
-    let frameId = 0;
-    let startTime = 0;
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      setPacketPosition(((timestamp - startTime) % 9000) / 9000);
-      frameId = window.requestAnimationFrame(animate);
-    };
-    frameId = window.requestAnimationFrame(animate);
-    return () => window.cancelAnimationFrame(frameId);
-  }, []);
+    if (!isInView) return;
+    if (prefersReducedMotion) {
+      const reducedMotionFrame = window.requestAnimationFrame(() => {
+        setHealthScore(96);
+        setBarsReady(true);
+      });
+      return () => window.cancelAnimationFrame(reducedMotionFrame);
+    }
 
-  useEffect(() => {
     let frameId = 0;
     const startTime = performance.now();
     const animate = (timestamp: number) => {
@@ -148,68 +138,33 @@ function LifecyclePreview() {
       if (progress < 1) frameId = window.requestAnimationFrame(animate);
     };
     frameId = window.requestAnimationFrame(animate);
-    const barsTimeout = window.setTimeout(() => setBarsReady(true), 120);
+    const barsTimeout = window.setTimeout(() => setBarsReady(true), 80);
     return () => {
       window.cancelAnimationFrame(frameId);
       window.clearTimeout(barsTimeout);
     };
-  }, []);
+  }, [isInView, prefersReducedMotion]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
+      if (Date.now() < carouselPauseUntil.current) return;
       setTestimonialIndex((current) => (current + 1) % testimonials.length);
     }, 4200);
     return () => window.clearInterval(intervalId);
   }, []);
 
   const currentTestimonial = testimonials[testimonialIndex];
-  const activeStation = Math.min(workflowSteps.length - 1, Math.floor(packetPosition * workflowSteps.length));
   const scoreCircumference = 2 * Math.PI * 47;
   const barValues = [61, 67, 73, 78, 84, 90, 96];
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+    <section ref={sectionRef} className="mx-auto max-w-7xl px-6 py-20 md:px-10">
       <div className="mb-12 text-center">
         <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-[#22d3ee]">Lifecycle preview</p>
         <h2 className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">See your pipeline in motion.</h2>
       </div>
 
-      <div className="space-y-5">
-        <div className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#111319] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.28)] md:p-8">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,rgba(99,102,241,0.12),transparent_35%),radial-gradient(circle_at_90%_100%,rgba(34,211,238,0.08),transparent_30%)]" />
-          <div className="relative mb-9 flex items-center justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8b90a3]">Continuous pipeline</p>
-              <h3 className="mt-1 text-lg font-semibold text-[#eef0f5]">From raw data to ready data</h3>
-            </div>
-            <span className="flex items-center gap-2 rounded-full border border-[#34d399]/20 bg-[#34d399]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-[#34d399]"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#34d399]" />Live</span>
-          </div>
-
-          <div className="relative px-2 pb-2 md:px-8">
-            <div className="absolute left-[10%] right-[10%] top-[27px] h-2 rounded-full bg-[#252a37]" />
-            <div className="absolute left-[10%] top-[27px] h-2 rounded-full bg-gradient-to-r from-[#34d399] via-[#22d3ee] to-[#6366f1] shadow-[0_0_18px_rgba(34,211,238,0.5)] transition-[width] duration-75" style={{ width: `calc(${packetPosition * 80}% )` }} />
-            <div className="absolute top-[22px] h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_35%_35%,white_0%,#22d3ee_48%,#6366f1_100%)] shadow-[0_0_12px_#22d3ee,0_0_28px_rgba(34,211,238,0.8)]" style={{ left: `${10 + packetPosition * 80}%` }} />
-            <div className="relative grid grid-cols-5 gap-2">
-              {workflowSteps.map((step, index) => {
-                const Icon = step.icon;
-                const passed = index < activeStation;
-                const active = index === activeStation;
-                return (
-                  <div key={step.label} className="relative flex min-w-0 flex-col items-center text-center">
-                    <div className={`relative flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 md:h-16 md:w-16 ${passed ? "border-[#34d399]/50 bg-gradient-to-br from-[#34d399] to-[#22d3ee] text-[#061117]" : active ? "border-[#22d3ee]/60 bg-gradient-to-br from-[#6366f1] to-[#22d3ee] text-white shadow-[0_0_26px_rgba(34,211,238,0.35)]" : "border-white/[0.08] bg-[#191c25] text-[#686e80]"}`}>
-                      {active && <span className="absolute -inset-2 animate-ping rounded-2xl border border-[#22d3ee]/60" />}
-                      <Icon className="relative z-10 h-5 w-5" />
-                    </div>
-                    <span className={`mt-4 font-mono text-[9px] uppercase tracking-[0.14em] transition-colors md:text-[10px] ${active ? "text-[#22d3ee]" : passed ? "text-[#34d399]" : "text-[#8b90a3]"}`}>Step {index + 1}</span>
-                    <span className="mt-1 text-[11px] text-[#eef0f5] md:text-xs">{step.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
           <div className="rounded-[28px] border border-white/[0.08] bg-[#111319] p-5 md:p-7">
             <div className="flex items-start justify-between">
               <div><p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#22d3ee]">Weekly trend</p><h3 className="mt-2 text-xl font-semibold text-[#eef0f5]">Dataset health score</h3></div>
@@ -238,9 +193,8 @@ function LifecyclePreview() {
               <blockquote className="max-w-xl text-xl leading-8 text-[#eef0f5] md:text-2xl">“{currentTestimonial.quote}”</blockquote>
               <div className="mt-7 flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-full font-mono text-xs font-semibold text-[#071018]" style={{ background: currentTestimonial.accent }}>{currentTestimonial.initials}</div><div><div className="text-sm font-medium text-[#eef0f5]">{currentTestimonial.name}</div><div className="mt-0.5 text-xs text-[#8b90a3]">{currentTestimonial.role}</div></div></div>
             </div>
-            <div className="flex gap-2">{testimonials.map((testimonial, index) => <button key={testimonial.name} type="button" aria-label={`Show testimonial from ${testimonial.name}`} onClick={() => setTestimonialIndex(index)} className={`h-1.5 rounded-full transition-all duration-300 ${index === testimonialIndex ? "w-8" : "w-1.5 bg-[#3a3e4b]"}`} style={index === testimonialIndex ? { background: testimonial.accent } : undefined} />)}</div>
+            <div className="flex gap-2">{testimonials.map((testimonial, index) => <button key={testimonial.name} type="button" aria-label={`Show testimonial from ${testimonial.name}`} onClick={() => { setTestimonialIndex(index); carouselPauseUntil.current = Date.now() + 5000; }} className={`h-1.5 rounded-full transition-all duration-300 ${index === testimonialIndex ? "w-8" : "w-1.5 bg-[#3a3e4b]"}`} style={index === testimonialIndex ? { background: testimonial.accent } : undefined} />)}</div>
           </div>
-        </div>
       </div>
       <style jsx>{` .testimonial-enter { animation: testimonialEnter 550ms ease-out both; } @keyframes testimonialEnter { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } } @media (prefers-reduced-motion: reduce) { .testimonial-enter { animation: none; } } `}</style>
     </section>
