@@ -17,6 +17,7 @@ import {
   Database,
   Gauge,
   Layers3,
+  Flag,
   Quote,
   ScanSearch,
   ShieldCheck,
@@ -24,6 +25,7 @@ import {
   Sparkles,
   Star,
   Upload,
+  User,
   Wand2,
 } from "lucide-react";
 
@@ -241,6 +243,94 @@ function LifecyclePreview() {
         </div>
       </div>
       <style jsx>{` .testimonial-enter { animation: testimonialEnter 550ms ease-out both; } @keyframes testimonialEnter { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } } @media (prefers-reduced-motion: reduce) { .testimonial-enter { animation: none; } } `}</style>
+    </section>
+  );
+}
+
+function SpeedRaceComparison() {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    let frameId = 0;
+    let startTime = 0;
+    const cycleDuration = 8000;
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      setElapsed((timestamp - startTime) % cycleDuration);
+      frameId = window.requestAnimationFrame(animate);
+    };
+    frameId = window.requestAnimationFrame(animate);
+    return () => window.cancelAnimationFrame(frameId);
+  }, []);
+
+  const aiProgress = Math.min(elapsed / 5500, 1);
+  const manualProgress = Math.min(elapsed / 5500 * 0.22, 0.22);
+  const aiComplete = elapsed >= 5500;
+  const manualHours = Math.min(elapsed / 5500 * 18, 18);
+  const milestones = ["Upload", "Review", "Fix issues", "Validate", "Ready"];
+
+  const renderTrack = ({
+    label,
+    progress,
+    accent,
+    Icon,
+    complete = false,
+    time,
+    status,
+  }: {
+    label: string;
+    progress: number;
+    accent: "red" | "green";
+    Icon: typeof User;
+    complete?: boolean;
+    time: string;
+    status: string;
+  }) => {
+    const isGreen = accent === "green";
+    const colors = isGreen
+      ? { text: "#34d399", border: "rgba(52,211,153,0.25)", fill: "linear-gradient(90deg,#34d399,#22d3ee)", glow: "rgba(52,211,153,0.55)" }
+      : { text: "#f87171", border: "rgba(248,113,113,0.25)", fill: "linear-gradient(90deg,#f87171,#fb7185)", glow: "rgba(248,113,113,0.5)" };
+
+    return (
+      <div className="rounded-2xl border bg-[#111319] p-5 md:p-6" style={{ borderColor: colors.border }}>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: `${colors.text}1c`, color: colors.text }}><Icon className="h-5 w-5" /></div>
+          <h3 className="text-base font-semibold text-[#eef0f5]">{label}</h3>
+          {complete && <span className="ml-auto rounded-full border px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em]" style={{ color: colors.text, borderColor: colors.border, background: `${colors.text}14` }}>Complete</span>}
+        </div>
+
+        <div className="mt-7">
+          <div className="relative h-3 rounded-full bg-[#252a37]">
+            <div className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-75" style={{ width: `${progress * 100}%`, background: colors.fill, boxShadow: `0 0 16px ${colors.glow}` }} />
+            <div className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#eef0f5] transition-[left] duration-75" style={{ left: `${Math.max(progress * 100, 1)}%`, background: colors.text, boxShadow: `0 0 10px ${colors.glow}, 0 0 24px ${colors.glow}` }} />
+          </div>
+          <div className="mt-3 grid grid-cols-5 gap-1">
+            {milestones.map((milestone, index) => <span key={milestone} className="text-[10px] transition-colors duration-300" style={{ color: progress >= index / 4 ? colors.text : "#626a7c", textAlign: index === 0 ? "left" : index === 4 ? "right" : "center" }}>{milestone}</span>)}
+          </div>
+        </div>
+
+        <div className="mt-5 flex items-center justify-between gap-4 border-t border-white/[0.08] pt-4">
+          <span className="text-xs text-[#8b90a3]">{status}</span>
+          <span className="shrink-0 font-mono text-sm font-semibold" style={{ color: colors.text }}>{time}</span>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <section id="how-it-works" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={fadeUp} transition={{ duration: 0.5 }} className="mx-auto mb-12 max-w-3xl text-center">
+        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-[#6366f1]">How it works</p>
+        <h2 className="text-3xl font-semibold tracking-[-0.05em] text-[#eef0f5] md:text-5xl">The same dataset. Two very different afternoons.</h2>
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#8b90a3]">Watch a 200K-row file move through manual review versus DataMedic, side by side.</p>
+      </motion.div>
+
+      <div className="space-y-4">
+        {renderTrack({ label: "Manual review", progress: manualProgress, accent: "red", Icon: User, time: `${manualHours.toFixed(1)}h`, status: "analyst hours spent, still in progress" })}
+        {renderTrack({ label: "DataMedic AI", progress: aiProgress, accent: "green", Icon: Bot, complete: aiComplete, time: `${(aiProgress * 6).toFixed(1)} min`, status: aiComplete ? "done — ready for modeling" : "cleaning in progress" })}
+      </div>
+
+      <div className="mt-8 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#8b90a3]"><Flag className="h-4 w-4 text-[#34d399]" />DataMedic finishes ~30x faster on the same workload</div>
     </section>
   );
 }
@@ -656,40 +746,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="how-it-works" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            variants={fadeUp}
-            transition={{ duration: 0.5 }}
-            className="mx-auto mb-12 max-w-2xl text-center"
-          >
-            <p className="mb-3 text-[12px] uppercase tracking-[0.2em] text-[#7B91FF]">How it works</p>
-            <h2 className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">From upload to confident decisions.</h2>
-          </motion.div>
-
-          <div className="relative">
-            <div className="absolute left-0 right-0 top-12 hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent md:block" />
-            <div className="grid gap-6 md:grid-cols-5">
-              {workflowSteps.map((step, index) => (
-                <motion.div
-                  key={step.label}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.45, delay: index * 0.08 }}
-                  className="relative rounded-[28px] border border-white/10 bg-white/[0.03] p-5 text-center"
-                >
-                  <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7B91FF] to-[#2FD9C4] text-base font-semibold text-white shadow-[0_12px_30px_rgba(108,124,251,0.35)]">
-                    {index + 1}
-                  </div>
-                  <div className="text-xl font-medium text-white">{step.label}</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <SpeedRaceComparison />
 
         <LifecyclePreview />
 
