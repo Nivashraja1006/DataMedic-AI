@@ -8,7 +8,6 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 import Navbar from "@/components/Navbar";
 import ChatWidget from "@/components/ChatWidget";
 import HeroText from "@/components/HeroText";
-import Slideshow from "@/components/Slideshow";
 import SignalFlow from "@/components/SignalFlow";
 import ImpactSection from "@/components/ImpactSection";
 import {
@@ -18,8 +17,13 @@ import {
   Database,
   Gauge,
   Layers3,
+  Quote,
+  ScanSearch,
   ShieldCheck,
+  ShieldAlert,
   Sparkles,
+  Star,
+  Upload,
   Wand2,
 } from "lucide-react";
 
@@ -54,42 +58,19 @@ const featureCards = [
   },
 ];
 
-const workflowSteps = ["Upload", "Profile", "Score", "Detect", "Clean"];
+const workflowSteps = [
+  { label: "Upload", icon: Upload },
+  { label: "Profile", icon: ScanSearch },
+  { label: "Score", icon: Gauge },
+  { label: "Detect", icon: ShieldAlert },
+  { label: "Clean", icon: Sparkles },
+];
 
-const slideData = [
-  {
-    title: "Dataset dashboard",
-    badge: "Live telemetry",
-    description: "Monitor data quality with AI-driven scoring, drift detection, and live issue summaries.",
-    accent: "#7b91ff",
-    content: [
-      { label: "Completeness", amount: 94 },
-      { label: "Validity", amount: 89 },
-      { label: "Integrity", amount: 96 },
-    ],
-  },
-  {
-    title: "AI insights panel",
-    badge: "Copilot ready",
-    description: "Turn noisy records into confident next steps with plain-English guidance and recommendations.",
-    accent: "#9a6bff",
-    content: [
-      { label: "Missing values", amount: 12 },
-      { label: "Duplicate IDs", amount: 6 },
-      { label: "Schema drift", amount: 3 },
-    ],
-  },
-  {
-    title: "Data cleaning workflow",
-    badge: "Automation",
-    description: "Prioritize cleanup actions with step-by-step, model-aware recommendation flows.",
-    accent: "#2fd9c4",
-    content: [
-      { label: "Normalization", amount: 88 },
-      { label: "Deduplication", amount: 73 },
-      { label: "Validation", amount: 91 },
-    ],
-  },
+const testimonials = [
+  { initials: "MC", name: "Maya Chen", role: "Data Lead, Northstar", accent: "#22d3ee", quote: "DataMedic turned our weekly quality review into a ten-minute check-in. The signal is finally easy to trust.", rating: 5 },
+  { initials: "JR", name: "Jon Rivera", role: "Analytics Director, Kinetic", accent: "#34d399", quote: "We caught a duplicate-account issue before it reached finance. That single alert paid for the workflow.", rating: 5 },
+  { initials: "AS", name: "Aisha Shah", role: "Platform Manager, Loomly", accent: "#f472b6", quote: "The recommendations are specific enough for an analyst to act on, without needing a data engineering handoff.", rating: 4 },
+  { initials: "OP", name: "Owen Park", role: "VP Data, Meridian", accent: "#818cf8", quote: "Our teams speak about data health in the same language now. That consistency has been the real win.", rating: 5 },
 ];
 
 const fadeUp = {
@@ -136,6 +117,132 @@ function LiveClock() {
   }, []);
 
   return <span>{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}</span>;
+}
+
+function LifecyclePreview() {
+  const [packetPosition, setPacketPosition] = useState(0);
+  const [healthScore, setHealthScore] = useState(0);
+  const [barsReady, setBarsReady] = useState(false);
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
+
+  useEffect(() => {
+    let frameId = 0;
+    let startTime = 0;
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      setPacketPosition(((timestamp - startTime) % 9000) / 9000);
+      frameId = window.requestAnimationFrame(animate);
+    };
+    frameId = window.requestAnimationFrame(animate);
+    return () => window.cancelAnimationFrame(frameId);
+  }, []);
+
+  useEffect(() => {
+    let frameId = 0;
+    const startTime = performance.now();
+    const animate = (timestamp: number) => {
+      const progress = Math.min((timestamp - startTime) / 1100, 1);
+      setHealthScore(Math.round(96 * (1 - Math.pow(1 - progress, 3))));
+      if (progress < 1) frameId = window.requestAnimationFrame(animate);
+    };
+    frameId = window.requestAnimationFrame(animate);
+    const barsTimeout = window.setTimeout(() => setBarsReady(true), 120);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(barsTimeout);
+    };
+  }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setTestimonialIndex((current) => (current + 1) % testimonials.length);
+    }, 4200);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  const currentTestimonial = testimonials[testimonialIndex];
+  const activeStation = Math.min(workflowSteps.length - 1, Math.floor(packetPosition * workflowSteps.length));
+  const scoreCircumference = 2 * Math.PI * 47;
+  const barValues = [61, 67, 73, 78, 84, 90, 96];
+
+  return (
+    <section className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+      <div className="mb-12 text-center">
+        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-[#22d3ee]">Lifecycle preview</p>
+        <h2 className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">See your pipeline in motion.</h2>
+      </div>
+
+      <div className="space-y-5">
+        <div className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#111319] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.28)] md:p-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,rgba(99,102,241,0.12),transparent_35%),radial-gradient(circle_at_90%_100%,rgba(34,211,238,0.08),transparent_30%)]" />
+          <div className="relative mb-9 flex items-center justify-between">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8b90a3]">Continuous pipeline</p>
+              <h3 className="mt-1 text-lg font-semibold text-[#eef0f5]">From raw data to ready data</h3>
+            </div>
+            <span className="flex items-center gap-2 rounded-full border border-[#34d399]/20 bg-[#34d399]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-[#34d399]"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#34d399]" />Live</span>
+          </div>
+
+          <div className="relative px-2 pb-2 md:px-8">
+            <div className="absolute left-[10%] right-[10%] top-[27px] h-2 rounded-full bg-[#252a37]" />
+            <div className="absolute left-[10%] top-[27px] h-2 rounded-full bg-gradient-to-r from-[#34d399] via-[#22d3ee] to-[#6366f1] shadow-[0_0_18px_rgba(34,211,238,0.5)] transition-[width] duration-75" style={{ width: `calc(${packetPosition * 80}% )` }} />
+            <div className="absolute top-[22px] h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_35%_35%,white_0%,#22d3ee_48%,#6366f1_100%)] shadow-[0_0_12px_#22d3ee,0_0_28px_rgba(34,211,238,0.8)]" style={{ left: `${10 + packetPosition * 80}%` }} />
+            <div className="relative grid grid-cols-5 gap-2">
+              {workflowSteps.map((step, index) => {
+                const Icon = step.icon;
+                const passed = index < activeStation;
+                const active = index === activeStation;
+                return (
+                  <div key={step.label} className="relative flex min-w-0 flex-col items-center text-center">
+                    <div className={`relative flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 md:h-16 md:w-16 ${passed ? "border-[#34d399]/50 bg-gradient-to-br from-[#34d399] to-[#22d3ee] text-[#061117]" : active ? "border-[#22d3ee]/60 bg-gradient-to-br from-[#6366f1] to-[#22d3ee] text-white shadow-[0_0_26px_rgba(34,211,238,0.35)]" : "border-white/[0.08] bg-[#191c25] text-[#686e80]"}`}>
+                      {active && <span className="absolute -inset-2 animate-ping rounded-2xl border border-[#22d3ee]/60" />}
+                      <Icon className="relative z-10 h-5 w-5" />
+                    </div>
+                    <span className={`mt-4 font-mono text-[9px] uppercase tracking-[0.14em] transition-colors md:text-[10px] ${active ? "text-[#22d3ee]" : passed ? "text-[#34d399]" : "text-[#8b90a3]"}`}>Step {index + 1}</span>
+                    <span className="mt-1 text-[11px] text-[#eef0f5] md:text-xs">{step.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div className="rounded-[28px] border border-white/[0.08] bg-[#111319] p-5 md:p-7">
+            <div className="flex items-start justify-between">
+              <div><p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#22d3ee]">Weekly trend</p><h3 className="mt-2 text-xl font-semibold text-[#eef0f5]">Dataset health score</h3></div>
+              <span className="flex items-center gap-2 rounded-full border border-[#34d399]/20 bg-[#34d399]/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-[#34d399]"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#34d399]" />Live</span>
+            </div>
+            <div className="mt-7 flex items-center gap-5">
+              <div className="relative h-32 w-32 shrink-0">
+                <svg viewBox="0 0 112 112" className="h-full w-full -rotate-90" role="img" aria-label={`Dataset health score ${healthScore}`}>
+                  <defs><linearGradient id="scoreGradient" x1="0%" x2="100%"><stop offset="0%" stopColor="#6366f1" /><stop offset="52%" stopColor="#22d3ee" /><stop offset="100%" stopColor="#34d399" /></linearGradient></defs>
+                  <circle cx="56" cy="56" r="47" fill="none" stroke="#252a37" strokeWidth="8" />
+                  <circle cx="56" cy="56" r="47" fill="none" stroke="url(#scoreGradient)" strokeLinecap="round" strokeWidth="8" strokeDasharray={scoreCircumference} strokeDashoffset={scoreCircumference * (1 - healthScore / 100)} className="transition-[stroke-dashoffset] duration-100" />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center"><span className="font-mono text-3xl font-semibold text-[#eef0f5]">{healthScore}</span><span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#8b90a3]">score</span></div>
+              </div>
+              <p className="max-w-xs text-sm leading-6 text-[#aeb2bf]">Up <strong className="text-[#34d399]">+34%</strong> vs last week, driven by fewer duplicate and null-value flags.</p>
+            </div>
+            <div className="mt-8 flex h-28 items-end justify-between gap-2 border-b border-white/[0.08] pb-1">
+              {barValues.map((value, index) => <div key={index} className="flex h-full flex-1 flex-col items-center justify-end gap-2"><div className="w-full max-w-8 rounded-t-md transition-[height] duration-700 ease-out" style={{ height: barsReady ? `${value}%` : "0%", transitionDelay: `${index * 90}ms`, background: `linear-gradient(to top, ${index < 2 ? "#6366f1" : index < 5 ? "#22d3ee" : "#34d399"}, rgba(255,255,255,0.16))` }} /><span className="font-mono text-[9px] uppercase text-[#626a7c]">{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][index]}</span></div>)}
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#111319] p-5 md:p-7">
+            <div className="flex items-center justify-between"><div className="flex items-center gap-3"><Quote className="h-5 w-5 text-[#f472b6]" /><p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#f472b6]">What teams say</p></div><span className="font-mono text-[10px] text-[#626a7c]">0{testimonialIndex + 1} / 0{testimonials.length}</span></div>
+            <div key={currentTestimonial.name} className="testimonial-enter mt-10 min-h-[190px]" style={{ "--testimonial-accent": currentTestimonial.accent } as React.CSSProperties}>
+              <div className="mb-5 flex gap-1" aria-label={`${currentTestimonial.rating} out of 5 stars`}>{[1, 2, 3, 4, 5].map((star) => <Star key={star} className="h-4 w-4" fill={star <= currentTestimonial.rating ? "currentColor" : "transparent"} style={{ color: star <= currentTestimonial.rating ? currentTestimonial.accent : "#3a3e4b" }} />)}</div>
+              <blockquote className="max-w-xl text-xl leading-8 text-[#eef0f5] md:text-2xl">“{currentTestimonial.quote}”</blockquote>
+              <div className="mt-7 flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-full font-mono text-xs font-semibold text-[#071018]" style={{ background: currentTestimonial.accent }}>{currentTestimonial.initials}</div><div><div className="text-sm font-medium text-[#eef0f5]">{currentTestimonial.name}</div><div className="mt-0.5 text-xs text-[#8b90a3]">{currentTestimonial.role}</div></div></div>
+            </div>
+            <div className="flex gap-2">{testimonials.map((testimonial, index) => <button key={testimonial.name} type="button" aria-label={`Show testimonial from ${testimonial.name}`} onClick={() => setTestimonialIndex(index)} className={`h-1.5 rounded-full transition-all duration-300 ${index === testimonialIndex ? "w-8" : "w-1.5 bg-[#3a3e4b]"}`} style={index === testimonialIndex ? { background: testimonial.accent } : undefined} />)}</div>
+          </div>
+        </div>
+      </div>
+      <style jsx>{` .testimonial-enter { animation: testimonialEnter 550ms ease-out both; } @keyframes testimonialEnter { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } } @media (prefers-reduced-motion: reduce) { .testimonial-enter { animation: none; } } `}</style>
+    </section>
+  );
 }
 
 export default function LandingPage() {
@@ -567,7 +674,7 @@ export default function LandingPage() {
             <div className="grid gap-6 md:grid-cols-5">
               {workflowSteps.map((step, index) => (
                 <motion.div
-                  key={step}
+                  key={step.label}
                   initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
@@ -577,63 +684,14 @@ export default function LandingPage() {
                   <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7B91FF] to-[#2FD9C4] text-base font-semibold text-white shadow-[0_12px_30px_rgba(108,124,251,0.35)]">
                     {index + 1}
                   </div>
-                  <div className="text-xl font-medium text-white">{step}</div>
+                  <div className="text-xl font-medium text-white">{step.label}</div>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-20 md:px-10">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-[12px] uppercase tracking-[0.2em] text-[#7B91FF]">Lifecycle preview</p>
-            <h2 className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">See your pipeline in motion.</h2>
-          </div>
-
-          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-            <Slideshow slides={slideData} />
-
-            <motion.div
-              initial={{ opacity: 0, x: 18 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.55 }}
-              className="rounded-[30px] border border-white/10 bg-gradient-to-br from-[#111a2f] to-[#0c1220] p-6"
-            >
-              <div className="mb-4 flex items-center gap-2 text-[#7B91FF]">
-                <Bot className="h-5 w-5" />
-                <span className="text-[12px] uppercase tracking-[0.2em]">AI Copilot</span>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-[#0D1424] p-4">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#7B91FF] to-[#2FD9C4] text-sm font-semibold text-white">AI</div>
-                  <div className="text-[12px] text-slate-300">What should I fix first?</div>
-                </div>
-                <div className="space-y-3 text-sm leading-7 text-slate-200">
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">Priority 1: Correct formatting issues in email and phone columns.</div>
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">Priority 2: Remove duplicate customer records before modeling.</div>
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">Priority 3: Review outliers in high-value transactions.</div>
-                </div>
-              </div>
-
-              <div className="mt-6 space-y-4">
-                {[
-                  "Identify hidden quality risks before they affect reporting.",
-                  "Turn raw data into a governed, consistent source of truth.",
-                  "Collaborate across teams with plain-language recommendations.",
-                ].map((reason) => (
-                  <div key={reason} className="flex gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-                    <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#34D399]/15 text-[#34D399]">
-                      <ShieldCheck className="h-4 w-4" />
-                    </div>
-                    <p className="text-sm leading-7 text-slate-200">{reason}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </section>
+        <LifecyclePreview />
 
         <ImpactSection />
 
