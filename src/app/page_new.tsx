@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
@@ -38,17 +39,21 @@ export default function LandingPage() {
       `}</style>
 
       {/* Navigation */}
-      <nav className="border-b border-white/8 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6C7CFB] to-[#2FD9C4] flex items-center justify-center">
-              <Sparkles size={18} />
-            </div>
-            <h1 className="display text-[18px] font-bold">DataMedic <span className="text-[#838DA3]">AI</span></h1>
+      <nav className="border-b border-white/8 px-4 py-3 sm:px-6 sm:py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center">
+            <Image
+              src="/logo-full.png"
+              alt="DataMedic AI logo"
+              width={320}
+              height={48}
+              priority
+              className="h-8 w-auto object-contain sm:h-10 md:h-11"
+            />
           </div>
-          <div className="flex items-center gap-3">
-            <a href="/login" className="text-[13px] text-[#8993A8] hover:text-white transition">Sign in</a>
-            <a href="/signup" className="glow-btn text-[13px] px-4 py-2 rounded-lg bg-gradient-to-r from-[#6C7CFB] to-[#9A6BFF] text-white font-medium">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <a href="/login" className="text-[11px] text-[#8993A8] transition hover:text-white sm:text-[13px]">Sign in</a>
+            <a href="/signup" className="glow-btn rounded-lg bg-gradient-to-r from-[#6C7CFB] to-[#9A6BFF] px-3 py-2 text-[11px] font-medium text-white sm:px-4 sm:py-2.5 sm:text-[13px]">
               Get started
             </a>
           </div>

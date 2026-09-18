@@ -20,7 +20,7 @@ export default function Navbar() {
         >
           <div className="flex items-center justify-center overflow-hidden rounded-none bg-transparent p-0">
             <Image
-              src="/logo-main.svg"
+              src="/logo-main-transparent.svg"
               alt="DataMedic AI logo"
               width={220}
               height={52}
